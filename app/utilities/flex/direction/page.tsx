@@ -386,193 +386,413 @@ export default function FlexDirectionPage() {
 
           {/* Real-world annotated examples with reasons */}
           <div className="space-y-6 border-t border-border pt-8">
-            <h2 className="text-3xl font-bold">
+            <h2 className="text-3xl font-bold text-foreground">
               Real-World Examples — explained
             </h2>
 
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">Responsive navigation</h3>
-              <CodeBlock
-                code={`<nav class="flex md:flex-row flex-col items-center gap-4 p-4">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* 1. Responsive navigation */}
+              <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:w-64 w-full flex-shrink-0 bg-slate-800 rounded p-3">
+                    <nav className="flex flex-col md:flex-row items-center gap-2">
+                      <div className="font-bold text-white">Logo</div>
+                      <div className="flex gap-2 flex-1 justify-center">
+                        <a className="text-sm text-slate-200">Home</a>
+                        <a className="text-sm text-slate-200">Contact</a>
+                      </div>
+                      <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm">
+                        Sign In
+                      </button>
+                    </nav>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Responsive navigation
+                      </h3>
+                      <button
+                        onClick={() => copyToClipboard("flex-col md:flex-row")}
+                        className="text-xs px-2 py-1 rounded bg-muted/10"
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    <div className="mt-2 max-w-full overflow-hidden">
+                      <CodeBlock
+                        code={`<nav class="flex md:flex-row flex-col items-center gap-4 p-4">
   <div class="font-bold">Logo</div>
   <div class="flex gap-4 flex-1 justify-center"> ... </div>
   <button>Sign In</button>
 </nav>`}
-                language="jsx"
-              />
-              <p className="text-sm text-muted-foreground">
-                Use <code className="bg-slate-700 px-1 rounded">flex-col</code>{" "}
-                on small screens and switch to{" "}
-                <code className="bg-slate-700 px-1 rounded">md:flex-row</code>{" "}
-                for desktop to stack nav on mobile and lay it out horizontally
-                on larger screens.
-              </p>
-            </div>
+                        language="jsx"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Stack on mobile (
+                        <code className="bg-slate-700 px-1 rounded">
+                          flex-col
+                        </code>
+                        ) and switch to{" "}
+                        <code className="bg-slate-700 px-1 rounded">
+                          md:flex-row
+                        </code>{" "}
+                        on larger screens so navs adapt without overflow.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">Sidebar + content</h3>
-              <CodeBlock
-                code={`<div class="flex">
+              {/* 2. Sidebar + content */}
+              <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:w-64 w-full flex-shrink-0 bg-slate-800 rounded p-3">
+                    <div className="flex gap-3">
+                      <aside className="flex-shrink-0 w-36 flex flex-col gap-2 p-2 bg-slate-700 rounded text-white">
+                        <a>Link 1</a>
+                        <a>Link 2</a>
+                        <a>Link 3</a>
+                      </aside>
+                      <main className="flex-1 p-2 bg-slate-900 rounded text-slate-200 min-w-0">
+                        Main content
+                      </main>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Sidebar + content
+                      </h3>
+                      <button
+                        onClick={() =>
+                          copyToClipboard("flex flex-col (sidebar)")
+                        }
+                        className="text-xs px-2 py-1 rounded bg-muted/10"
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    <div className="mt-2">
+                      <CodeBlock
+                        code={`<div class="flex">
   <aside class="flex-shrink-0 w-56 flex flex-col p-4"> ... </aside>
   <main class="flex-1 p-6">Main content</main>
 </div>`}
-                language="jsx"
-              />
-              <p className="text-sm text-muted-foreground">
-                The sidebar uses{" "}
-                <code className="bg-slate-700 px-1 rounded">flex-col</code> so
-                links stack vertically. Mark the sidebar as{" "}
-                <code className="bg-slate-700 px-1 rounded">flex-shrink-0</code>{" "}
-                (or fixed width) so it doesn't compress unexpectedly.
-              </p>
-            </div>
+                        language="jsx"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Use a fixed (non-shrinking) sidebar and{" "}
+                        <code className="bg-slate-700 px-1 rounded">
+                          flex-1 min-w-0
+                        </code>{" "}
+                        for main so it can shrink without causing overflow.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">
-                Chat / Timeline (newest on top)
-              </h3>
-              <CodeBlock
-                code={`<!-- Keep DOM order chronological, use flex-col-reverse to show newest at top -->
-<div class="flex flex-col-reverse gap-3" aria-live="polite" role="log">
+              {/* 3. Chat / Timeline (newest on top) */}
+              <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:w-64 w-full flex-shrink-0 bg-slate-800 rounded p-3 overflow-auto">
+                    <div className="flex flex-col-reverse gap-2 max-h-40">
+                      <div className="p-2 rounded bg-slate-700 text-white text-sm">
+                        Newest message
+                      </div>
+                      <div className="p-2 rounded bg-slate-700/90 text-white text-sm">
+                        Older message
+                      </div>
+                      <div className="p-2 rounded bg-slate-700/80 text-white text-sm">
+                        Oldest message
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Chat / Timeline (newest on top)
+                      </h3>
+                      <button
+                        onClick={() => copyToClipboard("flex-col-reverse")}
+                        className="text-xs px-2 py-1 rounded bg-muted/10"
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    <div className="mt-2">
+                      <CodeBlock
+                        code={`<div class="flex flex-col-reverse gap-3" aria-live="polite" role="log">
   <div class="p-3 rounded bg-slate-700 text-white">Newest message</div>
   <div class="p-3 rounded bg-slate-700/90 text-white">Older message</div>
   <div class="p-3 rounded bg-slate-700/80 text-white">Oldest message</div>
 </div>`}
-                language="jsx"
-              />
-              <p className="text-sm text-muted-foreground">
-                Use{" "}
-                <code className="bg-slate-700 px-1 rounded">
-                  flex-col-reverse
-                </code>{" "}
-                to place newest messages at the top visually while preserving
-                chronological DOM order. This keeps keyboard/screen-reader order
-                predictable while showing latest content first. Add{" "}
-                <code className="bg-slate-700 px-1 rounded">
-                  aria-live="polite"
-                </code>{" "}
-                for polite updates.
-              </p>
-            </div>
+                        language="jsx"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Keep DOM chronological and use{" "}
+                        <code className="bg-slate-700 px-1 rounded">
+                          flex-col-reverse
+                        </code>{" "}
+                        visually — preserves keyboard & screen reader order.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            {/* Image gallery (wrap horizontally) */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">
-                Image gallery (wrapping row)
-              </h3>
-              <CodeBlock
-                code={`<!-- Gallery: horizontal flow that wraps to next line -->
-<div class="flex flex-row flex-wrap gap-3">
-  <img class="w-48 h-32 object-cover rounded" src="/img/1.jpg" alt="..." />
-  <img class="w-48 h-32 object-cover rounded" src="/img/2.jpg" alt="..." />
-  <img class="w-48 h-32 object-cover rounded" src="/img/3.jpg" alt="..." />
-  <!-- more items -->
+              {/* 4. Image gallery (wrapping row) */}
+              <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:w-64 w-full flex-shrink-0 bg-slate-800 rounded p-3 overflow-auto">
+                    <div className="flex flex-row flex-wrap gap-3">
+                      <div className="w-36 h-24 bg-slate-700 rounded flex-shrink-0" />
+                      <div className="w-36 h-24 bg-slate-700 rounded flex-shrink-0" />
+                      <div className="w-36 h-24 bg-slate-700 rounded flex-shrink-0" />
+                      <div className="w-36 h-24 bg-slate-700 rounded flex-shrink-0" />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Image gallery (wrapping row)
+                      </h3>
+                      <button
+                        onClick={() =>
+                          copyToClipboard("flex-row flex-wrap gap-3")
+                        }
+                        className="text-xs px-2 py-1 rounded bg-muted/10"
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    <div className="mt-2">
+                      <CodeBlock
+                        code={`<div class="flex flex-row flex-wrap gap-3">
+  <img class="w-48 h-32 object-cover rounded" src="/img/1.jpg" />
+  <img class="w-48 h-32 object-cover rounded" src="/img/2.jpg" />
+  <img class="w-48 h-32 object-cover rounded" src="/img/3.jpg" />
 </div>`}
-                language="jsx"
-              />
-              <p className="text-sm text-muted-foreground">
-                A wrapping row is perfect for photo galleries or tag clouds —
-                use{" "}
-                <code className="bg-slate-700 px-1 rounded">
-                  flex-row flex-wrap
-                </code>{" "}
-                so items flow left→right then wrap to the next line. Combine
-                with fixed basis sizes for consistent rows.
-              </p>
-            </div>
+                        language="jsx"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Fixed item sizes (or{" "}
+                        <code className="bg-slate-700 px-1 rounded">
+                          basis-
+                        </code>{" "}
+                        utilities) + wrapping produce consistent gallery rows
+                        without overflow.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            {/* Product card (responsive: column on mobile, row on desktop) */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">
-                Product card (responsive media position)
-              </h3>
-              <CodeBlock
-                code={`<!-- Image above on mobile, left on desktop -->
-<div class="flex flex-col md:flex-row gap-4 p-4 border rounded">
+              {/* 5. Product card (responsive media position) */}
+              <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:w-64 w-full flex-shrink-0 bg-slate-800 rounded p-3 overflow-hidden">
+                    <div className="flex flex-col md:flex-row gap-3 items-start">
+                      <div className="w-full md:w-25 h-28 bg-slate-700 rounded flex-shrink-0" />
+                      <div className="flex-1 text-slate-200 min-w-0">
+                        <div className="font-semibold">Product title</div>
+                        <div className="text-sm text-muted-foreground">
+                          Short description...
+                        </div>
+                        <div className="mt-2 flex gap-2">
+                          <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm">
+                            Buy
+                          </button>
+                          <button className="px-3 py-1 border rounded text-sm">
+                            Details
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Product card (responsive)
+                      </h3>
+                      <button
+                        onClick={() => copyToClipboard("flex-col md:flex-row")}
+                        className="text-xs px-2 py-1 rounded bg-muted/10"
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    <div className="mt-2">
+                      <CodeBlock
+                        code={`<div class="flex flex-col md:flex-row gap-4 p-4 border rounded">
   <img class="w-full md:w-48 h-40 object-cover rounded" src="/product.jpg" alt="Product" />
-  <div class="flex-1">
-    <h4 class="font-semibold">Product title</h4>
-    <p class="text-sm text-muted-foreground">Short description...</p>
-    <div class="mt-3 flex gap-2">
-      <button class="px-3 py-1 rounded bg-blue-600 text-white">Buy</button>
-      <button class="px-3 py-1 rounded border">Details</button>
-    </div>
-  </div>
+  <div class="flex-1"> ... </div>
 </div>`}
-                language="jsx"
-              />
-              <p className="text-sm text-muted-foreground">
-                Use{" "}
-                <code className="bg-slate-700 px-1 rounded">
-                  flex-col md:flex-row
-                </code>{" "}
-                to stack the image above the content on mobile and place it left
-                on larger screens — great for cards that must remain compact on
-                phones but horizontal on desktop.
-              </p>
-            </div>
+                        language="jsx"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Stack media above content on mobile and put it left on
+                        desktop (
+                        <code className="bg-slate-700 px-1 rounded">
+                          flex-col md:flex-row
+                        </code>
+                        ) for compact, reusable cards.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            {/* Form layout (labels + inputs horizontally on wide screens) */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">
-                Form layout (row labels on wide screens)
-              </h3>
-              <CodeBlock
-                code={`<!-- Label left, input right on desktop; stacked on mobile -->
-<form class="space-y-4">
-  <div class="flex flex-col md:flex-row md:items-center md:gap-4">
-    <label class="md:w-40 text-sm">Full name</label>
-    <input class="flex-1 px-3 py-2 rounded border" />
-  </div>
+              {/* 6. Form layout (labels + inputs horizontally on wide screens) */}
+              <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:w-64 w-full flex-shrink-0 bg-slate-800 rounded p-3">
+                    <form className="space-y-3">
+                      {/* make this container min-w-0 so the flex-1 input can shrink */}
+                      <div className="flex flex-col md:flex-row md:items-center md:gap-3 md:min-w-0">
+                        <label className="md:w-36 md:flex-shrink-0 text-sm text-slate-200">
+                          Full name
+                        </label>
+                        {/* input should be able to shrink: w-full and min-w-0 */}
+                        <input className="flex-1 w-full min-w-0 px-3 py-2 rounded border bg-slate-700 text-white" />
+                      </div>
 
-  <div class="flex flex-col md:flex-row md:items-center md:gap-4">
-    <label class="md:w-40 text-sm">Email</label>
-    <input class="flex-1 px-3 py-2 rounded border" />
+                      <div className="flex flex-col md:flex-row md:items-center md:gap-3 md:min-w-0">
+                        <label className="md:w-36 md:flex-shrink-0 text-sm text-slate-200">
+                          Email
+                        </label>
+                        <input className="flex-1 w-full min-w-0 px-3 py-2 rounded border bg-slate-700 text-white" />
+                      </div>
+                    </form>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Form layout
+                      </h3>
+                      <button
+                        onClick={() => copyToClipboard("flex-col md:flex-row")}
+                        className="text-xs px-2 py-1 rounded bg-muted/10"
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    <div className="mt-2">
+                      <CodeBlock
+                        code={`<form class="space-y-4">
+  <div class="flex flex-col md:flex-row md:items-center md:gap-4 md:min-w-0">
+    <label class="md:w-40 md:flex-shrink-0">Full name</label>
+    <input class="flex-1 w-full min-w-0" />
   </div>
 </form>`}
-                language="jsx"
-              />
-              <p className="text-sm text-muted-foreground">
-                Stack labels above inputs on small screens with{" "}
-                <code className="bg-slate-700 px-1 rounded">flex-col</code>,
-                then switch to a horizontal label+field with{" "}
-                <code className="bg-slate-700 px-1 rounded">md:flex-row</code>{" "}
-                to save vertical space on desktop.
-              </p>
-            </div>
+                        language="jsx"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Stack labels above inputs on mobile (flex-col), then
+                        switch to horizontal label+field on desktop. Use{" "}
+                        <code className="bg-slate-700 px-1 rounded">
+                          min-w-0
+                        </code>{" "}
+                        on the flex container so the field can shrink instead of
+                        overflowing.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            {/* Toolbar / actions (row-reverse for RTL or action alignment) */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">
-                Toolbar / Actions (position primary action)
-              </h3>
-              <CodeBlock
-                code={`<!-- Put primary action visually on the right while keeping DOM order for accessibility -->
-<div class="flex flex-row-reverse gap-2">
+              {/* 7. Toolbar / actions (row-reverse for primary placement) */}
+              <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:w-64 w-full flex-shrink-0 bg-slate-800 rounded p-3">
+                    <div className="flex flex-row-reverse gap-2">
+                      <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm">
+                        Save
+                      </button>
+                      <button className="text-white px-3 py-1 border rounded text-sm">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Toolbar / Actions
+                      </h3>
+                      <button
+                        onClick={() => copyToClipboard("flex-row-reverse")}
+                        className="text-xs px-2 py-1 rounded bg-muted/10"
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    <div className="mt-2">
+                      <CodeBlock
+                        code={`<div class="flex flex-row-reverse gap-2">
   <button class="px-3 py-1 bg-blue-600 text-white rounded">Save</button>
   <button class="px-3 py-1 border rounded">Cancel</button>
 </div>`}
-                language="jsx"
-              />
-              <p className="text-sm text-muted-foreground">
-                <code className="bg-slate-700 px-1 rounded">
-                  flex-row-reverse
-                </code>{" "}
-                can visually place the primary button on the right while keeping
-                the DOM order logical (Cancel → Save). This is handy for RTL
-                layouts or when visual emphasis differs from DOM order — but
-                test keyboard focus order.
-              </p>
-            </div>
+                        language="jsx"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Use{" "}
+                        <code className="bg-slate-700 px-1 rounded">
+                          flex-row-reverse
+                        </code>{" "}
+                        to visually place the primary action on the right but
+                        keep a logical DOM order. Double-check keyboard focus
+                        order when using this.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            {/* Breadcrumbs (row, wrap if too long) */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">
-                Breadcrumbs (row & wrap)
-              </h3>
-              <CodeBlock
-                code={`<!-- Breadcrumbs: keep horizontal but allow wrapping -->
-<nav aria-label="Breadcrumb">
+              {/* 8. Breadcrumbs (row & wrap) */}
+              <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:w-64 w-full flex-shrink-0 bg-slate-800 rounded p-3">
+                    <nav aria-label="Breadcrumb">
+                      <ol className="flex flex-row gap-2 flex-wrap items-center text-sm text-slate-200">
+                        <li>Home</li>
+                        <li>/</li>
+                        <li>Products</li>
+                        <li>/</li>
+                        <li>Cool sneakers</li>
+                      </ol>
+                    </nav>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Breadcrumbs (row & wrap)
+                      </h3>
+                      <button
+                        onClick={() => copyToClipboard("flex-row flex-wrap")}
+                        className="text-xs px-2 py-1 rounded bg-muted/10"
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    <div className="mt-2">
+                      <CodeBlock
+                        code={`<nav aria-label="Breadcrumb">
   <ol class="flex flex-row gap-2 flex-wrap items-center text-sm">
     <li>Home</li>
     <li>/</li>
@@ -581,16 +801,20 @@ export default function FlexDirectionPage() {
     <li>Cool sneakers</li>
   </ol>
 </nav>`}
-                language="jsx"
-              />
-              <p className="text-sm text-muted-foreground">
-                Breadcrumbs usually read left→right — use{" "}
-                <code className="bg-slate-700 px-1 rounded">
-                  flex-row flex-wrap
-                </code>{" "}
-                so they stay on a single line when possible but wrap gracefully
-                on narrow screens.
-              </p>
+                        language="jsx"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Breadcrumbs usually read left→right — add{" "}
+                        <code className="bg-slate-700 px-1 rounded">
+                          flex-wrap
+                        </code>{" "}
+                        so they wrap gracefully on small screens rather than
+                        truncate.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <div className="space-y-4">
