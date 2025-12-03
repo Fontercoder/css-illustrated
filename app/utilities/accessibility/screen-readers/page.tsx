@@ -277,7 +277,7 @@ Form submitted successfully
           </section>
         </div>
       </main>
-      <Footer />
+      <Footer/>
     </div>
   );
 }
