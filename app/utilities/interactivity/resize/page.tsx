@@ -4,7 +4,7 @@ import UtilityPageTemplate from "../../components/utility-page-template"
 
 const resizeUtilities = {
   title: "Resize",
-  description: "Control whether an element can be resized by the user.",
+  description: "Control whether an element can be resized by the legends.",
   classes: [
     { class: "resize", description: "Resizable in all directions" },
     { class: "resize-none", description: "Not resizable" },
