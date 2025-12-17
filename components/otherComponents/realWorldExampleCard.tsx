@@ -1,13 +1,12 @@
-import React from "react";
-import CopyButton from "./copybutton";
-
+import React from "react"
+import CopyButton from "./copybutton"
 
 type ExampleCardProps = {
-  title: string;
-  code: string;
-  description: string;
-  children: React.ReactNode; // preview content
-};
+  title: string
+  code: string
+  description: string
+  children?: React.ReactNode
+}
 
 function ExampleCard({
   title,
@@ -16,28 +15,31 @@ function ExampleCard({
   children,
 }: ExampleCardProps) {
   return (
-    <div className="border border-border rounded-lg p-4 bg-card/20">
-      <h3 className="font-semibold mb-3">{title}</h3>
+    <div className="border border-border rounded-xl p-5 bg-card/30 space-y-4">
+      <h3 className="text-lg font-semibold">{title}</h3>
 
-      <div className="border border-border rounded p-3 mb-3">
-        {children}
+      <div className="border border-border rounded-lg bg-background p-4">
+        {children ?? (
+          <div
+            className="w-full"
+            dangerouslySetInnerHTML={{ __html: code }}
+          />
+        )}
       </div>
 
-      <div className="relative border border-border rounded-md bg-muted p-3">
+      <div className="relative border border-border rounded-lg bg-muted px-4 py-3">
         <div className="absolute right-3 top-3">
           <CopyButton text={code} />
         </div>
 
-        <pre className="overflow-x-auto text-sm">
+        <pre className="overflow-x-auto text-sm pr-10">
           <code>{code}</code>
         </pre>
       </div>
 
-      <p className="text-sm text-muted-foreground mt-2">
-        {description}
-      </p>
+      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
-  );
+  )
 }
 
-export default ExampleCard;
+export default ExampleCard

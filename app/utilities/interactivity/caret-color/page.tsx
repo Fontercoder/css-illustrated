@@ -114,24 +114,16 @@ export default function CaretColorPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <ExampleCard
                 title="Brand-aligned input"
-                code={`<input class="caret-purple-500 border px-3 py-2" />`}
+                code={`<input class="caret-purple-500 border rounded px-3 py-2 w-full" placeholder="Search products"/>`}
                 description="Subtle branding detail that improves perceived polish."
               >
-                <input
-                  className="caret-purple-500 border rounded px-3 py-2 w-full"
-                  placeholder="Search products"
-                />
               </ExampleCard>
 
               <ExampleCard
                 title="Error state reinforcement"
-                code={`<input class="caret-rose-500 border border-rose-400 px-3 py-2" />`}
+                code={`<input class="caret-rose-500 border border-rose-400 rounded px-3 py-2 w-full" placeholder="Invalid value" />`}
                 description="Use caret color to reinforce validation states."
               >
-                <input
-                  className="caret-rose-500 border border-rose-400 rounded px-3 py-2 w-full"
-                  placeholder="Invalid value"
-                />
               </ExampleCard>
             </div>
           </div>

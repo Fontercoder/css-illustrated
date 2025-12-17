@@ -105,7 +105,7 @@ export default function AppearancePage() {
     <option>India</option>
     <option>USA</option>
   </select>
-  <span class="absolute right-3 top-1/2 -translate-y-1/2">▼</span>
+  <span class="absolute right-3 top-1/2 -translate-y-1/2">▽</span>
 </div>`}
                 description="Remove the native arrow and replace it with a custom icon."
               >
@@ -115,24 +115,23 @@ export default function AppearancePage() {
                     <option>USA</option>
                   </select>
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    ▼
+                    ▽
                   </span>
                 </div>
               </ExampleCard>
 
               <ExampleCard
                 title="Custom checkbox UI"
-                code={`<input type="checkbox" class="appearance-none w-4 h-4 border rounded checked:bg-blue-600 checked:border-blue-600" />`}
+                code={`<label class="flex items-center gap-2">
+  <input
+    type="checkbox"
+    class="appearance-none w-4 h-4 border rounded checked:bg-blue-600 checked:border-blue-600"
+    checked
+  />
+  Remember me
+</label>`}
                 description="Appearance removal is the foundation for fully custom form controls."
               >
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="appearance-none w-4 h-4 border rounded checked:bg-blue-600 checked:border-blue-600"
-                    defaultChecked
-                  />
-                  Remember me
-                </label>
               </ExampleCard>
             </div>
           </div>

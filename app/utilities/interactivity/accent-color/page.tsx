@@ -165,35 +165,30 @@ export default function AccentColorPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <ExampleCard
                 title="Brand-colored forms"
-                code={`<form class="accent-indigo-500 space-y-2">
-                  <input type="checkbox" /> Subscribe
-                  <input type="radio" /> Monthly
-                  </form>`}
+                code={`<form class="accent-indigo-500">
+<label class="flex items-center gap-2">
+  <input type="checkbox" checked />
+  Subscribe
+</label>
+<label class="flex items-center gap-2 mt-2">
+  <input type="radio" name="plan" checked />
+  Monthly 
+</label>
+</form>`}
                 description="Match native inputs with your brand color without custom CSS."
               >
-                <div className="accent-indigo-500">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" defaultChecked />
-                    Subscribe
-                  </label>
-                  <label className="flex items-center gap-2 mt-2">
-                    <input type="radio" name="plan" defaultChecked />
-                    Monthly
-                  </label>
-                </div>
               </ExampleCard>
 
               <ExampleCard
                 title="Status-based UI"
-                code={`<input type="checkbox" class="accent-rose-500" /> Delete`}
+                code={`<div class="accent-rose-500">
+  <label class="flex items-center gap-2">
+    <input type="checkbox" />
+    Delete account
+  </label>
+</div>`}
                 description="Use red accents for destructive or irreversible actions."
               >
-                <div className="accent-rose-500">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" />
-                    Delete account
-                  </label>
-                </div>
               </ExampleCard>
             </div>
           </div>

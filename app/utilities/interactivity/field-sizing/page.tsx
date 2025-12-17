@@ -1,40 +1,50 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
-import CodeBlock from "@/app/utilities/components/code-block";
+import { useState, useEffect } from "react"
+import Navbar from "@/components/navbar"
+import Footer from "@/components/footer"
+import PageTitle from "@/components/otherComponents/pageTitle"
+import UtilityCard from "@/components/otherComponents/utilityClassCard"
+import UtilityExaButtons from "@/components/otherComponents/utilityExaBtn"
+import PreviewPanel from "@/components/otherComponents/previewPanel"
+import ExampleCard from "@/components/otherComponents/realWorldExampleCard"
+import SummaryTips from "@/components/otherComponents/summaryTips"
 
-type FieldSizing = "field-sizing-content" | "field-sizing-fixed";
+const utilities = [
+  {
+    className: "field-sizing-content",
+    desc: "Input width adapts to its content",
+  },
+  {
+    className: "field-sizing-fixed",
+    desc: "Input keeps a fixed inline size",
+  },
+]
 
 export default function FieldSizingPage() {
-  const [copied, setCopied] = useState<string | null>(null);
+  const utilityOptions = utilities.map((u) => u.className)
+  const [activeUtility, setActiveUtility] = useState(utilityOptions[0])
+  const [code, setCode] = useState("")
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(text);
-    setTimeout(() => setCopied(null), 2000);
-  };
+  useEffect(() => {
+    setCode(
+      `
+<div class="space-y-3">
+  <input
+    type="text"
+    class="${activeUtility} border rounded px-3 py-2"
+    placeholder="Type here..."
+  />
 
-  const utilities = [
-    {
-      className: "field-sizing-content",
-      desc: "Input width adapts to its content",
-    },
-    {
-      className: "field-sizing-fixed",
-      desc: "Input keeps a fixed width",
-    },
-  ];
-
-  const [sizing, setSizing] =
-    useState<FieldSizing>("field-sizing-content");
-
-  const playgroundMarkup = `<input
-  type="text"
-  class="field-sizing-content border rounded px-3 py-2"
-  placeholder="Type here..."
-/>`;
+  <input
+    type="text"
+    class="${activeUtility} border rounded px-3 py-2"
+    value="Short"
+  />
+</div>
+      `.trim()
+    )
+  }, [activeUtility])
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -42,111 +52,69 @@ export default function FieldSizingPage() {
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
-          {/* Header */}
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold">Field Sizing</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl">
-              Control how form fields calculate their inline size — either
-              adapting to content or staying fixed.
-            </p>
-          </div>
+          <PageTitle
+            title="Field Sizing"
+            description="Control how form fields calculate their inline size, either adapting to content or staying fixed."
+          />
 
-          {/* Utilities */}
           <div className="space-y-6 border-t border-border pt-8">
             <h2 className="text-3xl font-bold">Field Sizing Utilities</h2>
 
             <div className="grid md:grid-cols-2 gap-4">
               {utilities.map((u) => (
-                <button
+                <UtilityCard
                   key={u.className}
-                  onClick={() => copyToClipboard(u.className)}
-                  className="border border-border rounded-lg p-4 text-left hover:bg-card/50 transition"
-                >
-                  <div className="flex justify-between items-center">
-                    <code className="font-mono text-sm font-semibold text-foreground bg-muted/40 px-2 py-0.5 rounded">
-                      {u.className}
-                    </code>
-                    <span className="text-xs text-muted-foreground">
-                      {copied === u.className ? "Copied" : "Copy"}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {u.desc}
-                  </p>
-                </button>
+                  classNameValue={u.className}
+                  description={u.desc}
+                />
               ))}
             </div>
           </div>
 
-          {/* Playground */}
           <div className="space-y-6 border-t border-border pt-8">
             <h2 className="text-3xl font-bold">Interactive Playground</h2>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Controls */}
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-muted-foreground">
-                  Field sizing
-                </label>
-                <div className="flex gap-2 flex-wrap">
-                  {utilities.map((u) => (
-                    <button
-                      key={u.className}
-                      onClick={() =>
-                        setSizing(u.className as FieldSizing)
-                      }
-                      className={`px-3 py-1 text-sm rounded border ${
-                        sizing === u.className
-                          ? "border-blue-500 bg-blue-500/10"
-                          : "border-border"
-                      }`}
-                    >
-                      {u.className.replace("field-sizing-", "")}
-                    </button>
-                  ))}
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+              <div className="space-y-4">
+                <UtilityExaButtons
+                  label="Field Sizing"
+                  options={utilityOptions}
+                  activeValue={activeUtility}
+                  onSelect={setActiveUtility}
+                />
               </div>
 
-              {/* Preview */}
-              <div className="md:col-span-2 space-y-4">
-                <div className="border border-border rounded-lg p-4 bg-card/30">
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="font-semibold text-sm">Live preview</div>
-                    <button
-                      onClick={() => copyToClipboard(playgroundMarkup)}
-                      className="text-xs px-3 py-1 rounded bg-muted/10"
-                    >
-                      Copy markup
-                    </button>
-                  </div>
-
-                  <input
-                    type="text"
-                    className={`${sizing} border rounded px-3 py-2`}
-                    placeholder="Type and watch width"
-                  />
-
-                  <CodeBlock code={playgroundMarkup} language="jsx" />
-
-                  <p className="text-sm text-muted-foreground mt-3">
-                    Content-based sizing works best for short inputs like tags
-                    or tokens.
-                  </p>
-                </div>
+              <div className="md:col-span-2">
+                <PreviewPanel
+                  title="Live Preview"
+                  code={code}
+                  onCodeChange={setCode}
+                  previewClass="p-4"
+                  description="Type inside the input to observe inline size behavior."
+                />
               </div>
             </div>
           </div>
 
-          {/* Real-world examples */}
           <div className="space-y-6 border-t border-border pt-8">
             <h2 className="text-3xl font-bold">Real-world examples</h2>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Tag input */}
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <h3 className="font-semibold mb-3">Tag / token input</h3>
-
-                <div className="border border-border rounded p-3 mb-3 space-x-2">
+              <ExampleCard
+                title="Tag or token inputs"
+                code={`<div className="space-x-2">
+  <input
+    class="field-sizing-content border rounded px-2 py-1"
+    value="react"
+  />
+  <input
+    class="field-sizing-content border rounded px-2 py-1"
+    value="tailwind"
+  />
+</div>`}
+                description="Automatically fit short dynamic values like tags or labels."
+              >
+                {/* <div className="space-x-2">
                   <input
                     className="field-sizing-content border rounded px-2 py-1"
                     defaultValue="react"
@@ -155,61 +123,34 @@ export default function FieldSizingPage() {
                     className="field-sizing-content border rounded px-2 py-1"
                     defaultValue="tailwind"
                   />
-                </div>
+                </div> */}
+              </ExampleCard>
 
-                <CodeBlock
-                  code={`<input class="field-sizing-content" value="react" />
-<input class="field-sizing-content" value="tailwind" />`}
-                  language="jsx"
-                />
-
-                <p className="text-sm text-muted-foreground mt-2">
-                  Automatically fit tag inputs to their content length.
-                </p>
-              </div>
-
-              {/* Fixed layout form */}
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <h3 className="font-semibold mb-3">Consistent form layout</h3>
-
-                <div className="border border-border rounded p-3 mb-3">
-                  <input
-                    className="field-sizing-fixed w-64 border rounded px-3 py-2"
-                    placeholder="Email address"
-                  />
-                </div>
-
-                <CodeBlock
-                  code={`<input class="field-sizing-fixed w-64" />`}
-                  language="jsx"
-                />
-
-                <p className="text-sm text-muted-foreground mt-2">
-                  Keep alignment predictable in structured forms.
-                </p>
-              </div>
+              <ExampleCard
+                title="Consistent form layouts"
+                code={`<input class="field-sizing-fixed w-64 border px-3 py-2" placeholder="Email address" />`}
+                description="Maintain predictable alignment in structured forms."
+              >
+              </ExampleCard>
             </div>
           </div>
 
-          {/* Tips */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 space-y-3">
-            <h3 className="font-semibold">Summary tips</h3>
-            <ul className="text-sm text-muted-foreground space-y-2">
-              <li>
-                Use content sizing for short, dynamic values.
-              </li>
-              <li>
-                Prefer fixed sizing in traditional forms.
-              </li>
-              <li>
-                Combine with width utilities for best control.
-              </li>
-            </ul>
-          </div>
+          <SummaryTips
+            items={[
+              "1. field-sizing-content adapts to the text length.",
+              "2. Ideal for tags, filters, and inline editors.",
+              "3. field-sizing-fixed prevents layout shifts.",
+              "4. Best suited for traditional forms.",
+              "5. Combine with width utilities for precise control.",
+              "6. Content sizing can feel unstable for long text.",
+              "7. Fixed sizing improves visual consistency.",
+              "8. Test with dynamic user input before choosing.",
+            ]}
+          />
         </div>
       </main>
 
       <Footer />
     </div>
-  );
+  )
 }

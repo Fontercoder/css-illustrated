@@ -110,36 +110,30 @@ export default function ColorSchemePage() {
             <div className="grid md:grid-cols-2 gap-6">
               <ExampleCard
                 title="Dark widgets inside light UI"
-                code={`<div class="scheme-dark">
-  <input class="border px-3 py-2" />
+                code={`<div class="scheme-dark p-3 border rounded space-y-2">
+  <input
+    class="border rounded px-3 py-2 w-full"
+    placeholder="Dark input"
+  />
+  <label class="flex items-center gap-2">
+    <input type="checkbox" />
+    Checkbox
+  </label>
 </div>`}
                 description="Force dark native controls inside an otherwise light interface."
               >
-                <div className="scheme-dark p-3 border rounded space-y-2">
-                  <input
-                    className="border rounded px-3 py-2 w-full"
-                    placeholder="Dark input"
-                  />
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" />
-                    Checkbox
-                  </label>
-                </div>
               </ExampleCard>
 
               <ExampleCard
                 title="Respect system preference"
-                code={`<div class="scheme-normal">
-  <input class="border px-3 py-2" />
+                code={`<div class="scheme-normal p-3 border rounded">
+  <input
+    class="border rounded px-3 py-2 w-full"
+    placeholder="System-based input"
+  />
 </div>`}
                 description="Let the operating system decide light or dark mode automatically."
               >
-                <div className="scheme-normal p-3 border rounded">
-                  <input
-                    className="border rounded px-3 py-2 w-full"
-                    placeholder="System-based input"
-                  />
-                </div>
               </ExampleCard>
             </div>
           </div>
