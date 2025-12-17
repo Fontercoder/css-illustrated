@@ -175,5 +175,5 @@ export default function CursorPage() {
 
       <Footer />
     </div>
-  )
+  );
 }
