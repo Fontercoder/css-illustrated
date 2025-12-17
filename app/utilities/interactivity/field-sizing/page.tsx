@@ -114,16 +114,7 @@ export default function FieldSizingPage() {
 </div>`}
                 description="Automatically fit short dynamic values like tags or labels."
               >
-                {/* <div className="space-x-2">
-                  <input
-                    className="field-sizing-content border rounded px-2 py-1"
-                    defaultValue="react"
-                  />
-                  <input
-                    className="field-sizing-content border rounded px-2 py-1"
-                    defaultValue="tailwind"
-                  />
-                </div> */}
+                
               </ExampleCard>
 
               <ExampleCard
