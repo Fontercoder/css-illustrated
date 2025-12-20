@@ -1,8 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
+import FlexLayout from "../layout"
+import { PageHero } from "@/components/shared/page-hero"
+import { UtilityGrid } from "@/components/shared/utility-grid"
+import { ExampleSection, ExampleCard } from "@/components/shared/example-section"
+import { TipsSection } from "@/components/shared/tips-section"
+import { MentalModelSection } from "@/components/shared/mental-model-section"
+import { CommonMistakesSection } from "@/components/shared/common-mistakes-section"
 import CodeBlock from "@/app/utilities/components/code-block"
 
 // Animated flex item component
@@ -71,43 +76,64 @@ export default function FlexBasisPage() {
     { class: "basis-full", desc: "flex-basis: 100% — takes full container width" },
   ]
 
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <main className="flex-1 px-4 py-12">
-        <div className="max-w-7xl mx-auto space-y-12">
+return (
+    <FlexLayout>
+      <div className="max-w-7xl mx-auto px-4 py-12 space-y-12">
 
-          {/* Section 1: Description */}
-          <div className="space-y-4 text-center">
-            <h1 className="text-5xl font-bold text-foreground">Flex Basis</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Flex-basis sets the <span className="font-semibold">initial main size</span> of a flex item before it grows
-              or shrinks. Think of it as the “starting width” of a flex item. When combined with{" "}
-              <code className="bg-slate-700 px-1 rounded">flex-grow</code> and{" "}
-              <code className="bg-slate-700 px-1 rounded">flex-shrink</code>, you get powerful responsive layouts.
-            </p>
-          </div>
+        {/* Section 1: Description */}
+        <PageHero 
+          title="Flex Basis"
+          description="Flex-basis sets initial main size of a flex item before it grows or shrinks. Think of it as 'starting width' of a flex item. When combined with flex-grow and flex-shrink, you get powerful responsive layouts."
+        />
 
-          {/* Section 2: Grid of Classes */}
-          <div className="space-y-6 border-t border-border pt-8">
-            <h2 className="text-3xl font-bold text-foreground">Flex-Basis Utility Classes</h2>
-            <p className="text-muted-foreground">Click to copy a class to use in your layout.</p>
-            <div className="grid md:grid-cols-3 gap-4">
-              {flexBasisClasses.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="border border-border rounded-lg p-4 hover:bg-card/50 transition cursor-pointer group"
-                  onClick={() => navigator.clipboard.writeText(item.class)}
-                >
-                  <code className="text-black text-sm font-mono text-accent font-semibold">{item.class}</code>
-                  <p className="text-sm text-muted-foreground mt-2">{item.desc}</p>
-                  <span className="text-xs text-muted-foreground mt-3 opacity-0 group-hover:opacity-100 transition">
-                    Click to copy
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <MentalModelSection
+            title="Understanding Flex Basis"
+            description="Flex basis establishes the initial main size of flex items before growing or shrinking occurs, providing predictable starting points for responsive behavior."
+            features={[
+              "Sets initial width/height before flex calculations",
+              "Works with flex-grow and flex-shrink for responsive sizing",
+              "Accepts length values, percentages, and auto",
+              "Affects how remaining space is distributed",
+              "Critical for creating predictable grid layouts"
+            ]}
+            layerAssignment="Sizing Layer - Defines initial item dimensions"
+            browserBehavior="Browser calculates initial size based on basis, then applies grow/shrink calculations"
+          />
+
+          <UtilityGrid
+            title="Flex-Basis Utility Classes"
+            items={[
+              { cls: "basis-0", desc: "flex-basis: 0 — starts from zero and grows/shrinks based on flex rules" },
+              { cls: "basis-auto", desc: "flex-basis: auto — item size depends on content" },
+              { cls: "basis-1/4", desc: "flex-basis: 25% of container width" },
+              { cls: "basis-1/3", desc: "flex-basis: 33.33% of container width" },
+              { cls: "basis-1/2", desc: "flex-basis: 50% of container width" },
+              { cls: "basis-full", desc: "flex-basis: 100% — takes full container width" }
+            ]}
+          />
+
+          <CommonMistakesSection
+            mistakes={[
+              {
+                title: "Using basis without considering container width",
+                reason: "Fixed basis values can cause overflow in narrow containers",
+                example: "<div class=\"basis-96\">Very wide content in small container</div>",
+                level: "critical"
+              },
+              {
+                title: "Confusing basis with width",
+                reason: "Basis affects flex calculation, not direct width like in block layout",
+                example: "<div class=\"basis-1/2 w-full\">Conflicting sizing</div>",
+                level: "warning"
+              },
+              {
+                title: "Not combining basis with grow",
+                reason: "Fixed basis without grow leaves unused space in containers",
+                example: "<div class=\"basis-1/3\">Content doesn't fill remaining space</div>",
+                level: "info"
+              }
+            ]}
+          />
 
           {/* Section 3: Animated Demonstrations */}
           <div className="space-y-6 border-t border-border pt-8">
@@ -179,9 +205,7 @@ export default function FlexBasisPage() {
 
           
 
-                   {/* Section 4: Detailed Real-World Examples */}
-          <div className="space-y-12 border-t border-border pt-8">
-            <h2 className="text-3xl font-bold text-foreground">Detailed Real-World Examples</h2>
+          <ExampleSection title="Detailed Real-World Examples">
 
             {/* Example 1: Responsive Card Grid */}
             <div className="space-y-4">
@@ -264,45 +288,17 @@ export default function FlexBasisPage() {
                 language="jsx"
               />
             </div>
-          </div>
-          {/* Section 5: Tips (unchanged UI) */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 space-y-3">
-            <h3 className="font-semibold text-foreground">Tips & Common Patterns</h3>
-            <ul className="space-y-2 text-muted-foreground text-sm">
-              <li className="flex gap-2">
-                <span className="text-blue-400">•</span>
-                <span>
-                  Use <code className="bg-slate-700 px-1 rounded">flex-1</code> to create equal-width columns that adapt
-                  to container
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-blue-400">•</span>
-                <span>
-                  Combine <code className="bg-slate-700 px-1 rounded">basis-{"{size}"}</code> with{" "}
-                  <code className="bg-slate-700 px-1 rounded">flex-grow</code> for responsive grids
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-blue-400">•</span>
-                <span>
-                  Use <code className="bg-slate-700 px-1 rounded">flex-shrink-0</code> to prevent items from shrinking
-                  below their size
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-blue-400">•</span>
-                <span>
-                  Use <code className="bg-slate-700 px-1 rounded">flex-none</code> for fixed-size sidebars or buttons in
-                  flex containers
-                </span>
-              </li>
-            </ul>
-          </div>
+          </ExampleSection>
+          <TipsSection 
+            tips={[
+              { bold: "Equal columns:", text: "Use flex-1 to create equal-width columns that adapt to container" },
+              { bold: "Responsive grids:", text: "Combine basis- with flex-grow for responsive grid layouts" },
+              { bold: "Prevent shrinking:", text: "Use flex-shrink-0 to prevent items from shrinking below their size" },
+              { bold: "Fixed elements:", text: "Use flex-none for fixed-size sidebars or buttons in flex containers" },
+              { bold: "Content-based sizing:", text: "Use basis-auto for items that should size based on their content" }
+            ]}
+          />
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </FlexLayout>
   )
 }

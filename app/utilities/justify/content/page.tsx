@@ -1,8 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import { PageHero } from "@/components/shared/page-hero";
+import { UtilityGrid } from "@/components/shared/utility-grid";
+import { UtilityPlayground } from "@/components/shared/utility_playground";
+import { ExampleSection, ExampleCard } from "@/components/shared/example-section";
+import { TipsSection } from "@/components/shared/tips-section";
+import { CommonMistakesSection } from "@/components/shared/common-mistakes-section";
+import { MentalModelSection } from "@/components/shared/mental-model-section";
+import { ComparisonTable } from "@/components/shared/comparison-table";
 import CodeBlock from "../../components/code-block";
 
 export default function JustifyContentPage() {
@@ -16,30 +22,6 @@ export default function JustifyContentPage() {
   ];
 
   const [activeClass, setActiveClass] = useState(justifyClasses[0]);
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-
-  const copyToClipboard = (text: string, index: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
-  };
-
-  const CopyableCode = ({ code, index }: { code: string; index: number }) => (
-    <div
-      className="relative border border-border rounded-lg p-4 hover:bg-card/50 cursor-pointer group transition"
-      onClick={() => copyToClipboard(code, index)}
-    >
-      {copiedIndex === index && (
-        <div className="absolute top-2 left-2 px-2 py-0.5 text-xs text-white bg-green-600 rounded">
-          Copied!
-        </div>
-      )}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-0.5 text-xs text-gray-700 bg-white rounded opacity-0 group-hover:opacity-100 transition">
-        Click to copy
-      </div>
-      <CodeBlock code={code} language="html" />
-    </div>
-  );
 
   // Detailed explanations per class
   const explanations: Record<string, string> = {
@@ -328,31 +310,101 @@ export default function JustifyContentPage() {
     ],
   };
 
-  const benefits: Record<string, string[]> = {
-    "justify-start": ["Items align to the start, creating natural left-to-right flow.", "Helps organize content predictably."],
-    "justify-center": ["Centers items for balanced layouts.", "Ideal for focal content."],
-    "justify-end": ["Items align to the end, good for controls/buttons.", "Useful in forms or toolbars."],
-    "justify-between": ["Distributes space between items, edges at extremes.", "Helps spread items in a row."],
-    "justify-around": ["Equal space around items.", "Good for evenly spaced navigation or buttons."],
-    "justify-evenly": ["Uniform spacing between all items and edges.", "Creates symmetric and clean layouts."],
-  };
-
-  const commonUseCases: Record<string, string[]> = {
-    "justify-start": ["Navigation bars", "Button groups", "Cards", "Forms"],
-    "justify-center": ["Centered headings", "Modal content", "Button groups"],
-    "justify-end": ["Action buttons", "Toolbar controls", "Footer items"],
-    "justify-between": ["Header layouts", "Navbar with edge links", "Button groups spread out"],
-    "justify-around": ["Navbars", "Form buttons", "Card groups"],
-    "justify-evenly": ["Menu items", "Button rows", "Card layout evenly spaced"],
-  };
-
-  const commonMistakes: Record<string, string[]> = {
-    "justify-start": ["Not applying flex to the container can break alignment.", "Adding extra margin may offset alignment."],
-    "justify-center": ["Forgetting to set `flex` will not center items.", "Mixing with `ml-auto` or `mr-auto` can conflict."],
-    "justify-end": ["Forgetting `flex` or using `float` instead.", "Overlapping with other spacing utilities."],
-    "justify-between": ["Too many items may crowd edges.", "Incorrect spacing may occur without `gap`."],
-    "justify-around": ["Might look uneven if container width is small.", "Overusing nested flex containers can confuse spacing."],
-    "justify-evenly": ["Ignoring padding/margins can break even spacing.", "Combining with `space-x-*` may double spacing."],
+  const commonMistakes: Record<string, Array<{ title: string; reason: string; example: string }>> = {
+    "justify-start": [
+      {
+        title: "Not applying flex container",
+        reason: "Without `display: flex` on the container, justify-* utilities won't work.",
+        example: `<div class="justify-start">This won't work</div>
+<!-- Should be -->
+<div class="flex justify-start">This works</div>`
+      },
+      {
+        title: "Conflicting margin utilities",
+        reason: "Adding margin-auto or fixed margins can override justify behavior.",
+        example: `<div class="flex justify-start">
+  <div class="ml-auto">This ignores justify-start</div>
+</div>`
+      }
+    ],
+    "justify-center": [
+      {
+        title: "Missing flex context",
+        reason: "Forgetting to add `flex` class to the container prevents centering.",
+        example: `<div class="justify-center">Not centered</div>
+<!-- Should be -->
+<div class="flex justify-center">Centered</div>`
+      },
+      {
+        title: "Mixing with auto margins",
+        reason: "Using `ml-auto` or `mr-auto` conflicts with centering.",
+        example: `<div class="flex justify-center">
+  <div class="mr-auto">This breaks centering</div>
+</div>`
+      }
+    ],
+    "justify-end": [
+      {
+        title: "Using float instead",
+        reason: "Using legacy float properties won't work with flexbox justify.",
+        example: `<div class="float-right">Old approach</div>
+<!-- Should be -->
+<div class="flex justify-end">
+  <div>Flex approach</div>
+</div>`
+      },
+      {
+        title: "Overlapping with other spacing",
+        reason: "Combining justify-end with gap utilities might create unexpected spacing.",
+        example: `<div class="flex justify-end gap-8">
+  <!-- Items may not reach the edge due to gap -->
+</div>`
+      }
+    ],
+    "justify-between": [
+      {
+        title: "Too many items",
+        reason: "With many items, justify-between might make edge items less visually distinct.",
+        example: `<div class="flex justify-between">
+  <!-- 10+ items might crowd edges -->
+</div>
+<!-- Consider using gap utilities for better spacing -->`
+      },
+      {
+        title: "Ignoring gap utilities",
+        reason: "Without gap, items might be too close together in the middle.",
+        example: `<div class="flex justify-between">Items too close</div>
+<!-- Better -->
+<div class="flex justify-between gap-4">Properly spaced</div>`
+      }
+    ],
+    "justify-around": [
+      {
+        title: "Small container width",
+        reason: "In narrow containers, justify-around might look uneven.",
+        example: `<div class="flex justify-around w-32">May look cramped</div>`
+      },
+      {
+        title: "Nested flex containers",
+        reason: "Using nested justify-around can create confusing spacing patterns.",
+        example: `<div class="flex justify-around">
+  <div class="flex justify-around">Double spacing confusion</div>
+</div>`
+      }
+    ],
+    "justify-evenly": [
+      {
+        title: "Combining with gap utilities",
+        reason: "Mixing justify-evenly with gap-* doubles the spacing.",
+        example: `<div class="flex justify-evenly gap-4">Too much space</div>
+<!-- Use either justify-evenly OR gap utilities -->`
+      },
+      {
+        title: "Ignoring padding/margins",
+        reason: "Container padding can break the visual evenness.",
+        example: `<div class="flex justify-evenly p-8">Padding skews evenness</div>`
+      }
+    ]
   };
 
   const renderDiagram = (cls: string) => {
@@ -376,80 +428,149 @@ export default function JustifyContentPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <main className="flex-1 max-w-5xl px-8 py-12 space-y-12 text-left">
-        <h1 className="text-2xl font-semibold text-foreground mb-4">Tailwind Justify Content Utilities</h1>
+      <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
+        <PageHero 
+          title="Justify Content Utilities"
+          description="Complete guide to CSS justify-content utilities for flexbox layouts. Master horizontal alignment of flex items with start, center, end, between, around, and evenly options."
+        />
 
-        {/* Buttons */}
-        <div className="flex gap-4 mb-6 flex-wrap">
-          {justifyClasses.map((cls) => (
-            <button
-              key={cls}
-              className={`px-4 py-2 rounded font-medium ${
-                activeClass === cls
-                  ? "bg-blue-600 text-white shadow"
-                  : "bg-card/20 text-foreground hover:bg-card/30"
-              }`}
-              onClick={() => setActiveClass(cls)}
-            >
-              {cls}
-            </button>
-          ))}
-        </div>
+        <MentalModelSection
+          title="Understanding Justify Content"
+          description="Justify-content controls the horizontal distribution of flex items along the main axis. It's essential for creating balanced layouts, navigation menus, button groups, and responsive designs."
+          features={[
+            "Distributes space between and around flex items",
+            "Works only on flex containers (display: flex)",
+            "Controls main axis alignment (horizontal by default)",
+            "Six main values: start, center, end, between, around, evenly",
+            "Essential for responsive design and component layouts",
+            "Interacts with gap utilities for precise spacing control"
+          ]}
+          layerAssignment="Flexbox Layout Layer - Main axis alignment and space distribution"
+          browserBehavior="Browser calculates available space and distributes items according to the specified alignment rule"
+        />
 
-        {/* Diagram */}
-        {renderDiagram(activeClass)}
+        <ComparisonTable
+          title="Justify Content Properties Comparison"
+          columns={["Utility", "Alignment Behavior", "Space Distribution", "Best Use Cases"]}
+          rows={[
+            {
+              feature: "justify-start",
+              values: ["Items to left edge", "No space distribution", "Left-aligned nav, forms"]
+            },
+            {
+              feature: "justify-center", 
+              values: ["Items centered", "Equal left/right space", "Modal content, centered sections"]
+            },
+            {
+              feature: "justify-end", 
+              values: ["Items to right edge", "No space distribution", "Right-aligned buttons, toolbars"]
+            },
+            {
+              feature: "justify-between", 
+              values: ["Items spread out", "Space between only", "Headers, button groups at edges"]
+            },
+            {
+              feature: "justify-around", 
+              values: ["Items with space around", "Equal space around each", "Distributed navigation, spaced cards"]
+            },
+            {
+              feature: "justify-evenly", 
+              values: ["Perfectly even spacing", "Equal space everywhere", "Symmetric layouts, evenly spaced buttons"]
+            }
+          ]}
+        />
 
-        {/* Explanation */}
-        <div className="text-sm text-muted-foreground">
-          {explanations[activeClass]}
-        </div>
+        <UtilityGrid
+          title="Justify Content Utilities Overview"
+          items={[
+            { cls: "justify-start", desc: "Align to left edge" },
+            { cls: "justify-center", desc: "Center horizontally" },
+            { cls: "justify-end", desc: "Align to right edge" },
+            { cls: "justify-between", desc: "Space between items" },
+            { cls: "justify-around", desc: "Space around items" },
+            { cls: "justify-evenly", desc: "Equal space everywhere" }
+          ]}
+        />
 
-        {/* Benefits */}
-        <section className="space-y-2 border border-border rounded-lg p-4 bg-card/30">
-          <h2 className="text-2xl font-semibold text-foreground">Benefits</h2>
-          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-            {benefits[activeClass].map((item, idx) => (
-              <li key={idx}>{item}</li>
+        <section className="space-y-6 border-t border-border pt-8">
+          <h2 className="text-3xl font-bold">Interactive Playground</h2>
+          <p className="text-muted-foreground">Experiment with different justify-content values and see how they affect item alignment.</p>
+
+          <div className="flex gap-4 mb-6 flex-wrap">
+            {justifyClasses.map((cls) => (
+              <button
+                key={cls}
+                className={`px-4 py-2 rounded font-medium ${
+                  activeClass === cls
+                    ? "bg-blue-600 text-white shadow"
+                    : "bg-card/20 text-foreground hover:bg-card/30"
+                }`}
+                onClick={() => setActiveClass(cls)}
+              >
+                {cls}
+              </button>
             ))}
-          </ul>
+          </div>
+
+          {renderDiagram(activeClass)}
+
+          <div className="text-sm text-muted-foreground mb-6">
+            {explanations[activeClass]}
+          </div>
         </section>
 
-        {/* Real-World Examples */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-semibold text-foreground">Real-World Examples</h2>
-          {examplesData[activeClass].map((ex, idx) => (
-            <div key={idx} className="space-y-2 border border-border rounded-lg p-4 bg-card/20">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                <h3 className="text-lg font-semibold text-foreground">{ex.title}</h3>
-                <p className="text-sm text-muted-foreground">{ex.note}</p>
+        <UtilityPlayground
+          title="Justify Content Playground"
+          description="Test justify-content properties with different item configurations and see real-time effects."
+          options={justifyClasses}
+          defaultValue="justify-start"
+          buildMarkup={(justifyClass) => {
+            return `<div class="flex ${justifyClass} gap-4 p-4 border">
+  <div class="w-16 h-16 bg-blue-500"></div>
+  <div class="w-16 h-16 bg-blue-500"></div>
+  <div class="w-16 h-16 bg-blue-500"></div>
+</div>`
+          }}
+          renderPreview={(justifyClass) => {
+            const containerClass = `flex ${justifyClass} gap-4 p-4 border border-border rounded`;
+            return (
+              <div className={containerClass}>
+                <div className="w-16 h-16 bg-blue-500 rounded"></div>
+                <div className="w-16 h-16 bg-blue-500 rounded"></div>
+                <div className="w-16 h-16 bg-blue-500 rounded"></div>
               </div>
-              <CopyableCode code={ex.code} index={idx} />
-            </div>
+            )
+          }}
+        />
+
+        <ExampleSection title="Real-World Examples">
+          {examplesData[activeClass].map((ex, idx) => (
+            <ExampleCard
+              key={idx}
+              title={ex.title}
+              description={ex.note}
+              code={ex.code}
+            >
+              <div dangerouslySetInnerHTML={{ __html: ex.code.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/class="/g, 'class="bg-gray-100 p-2 rounded text-gray-800 ') }} />
+            </ExampleCard>
           ))}
-        </section>
+        </ExampleSection>
 
-        {/* Common Mistakes */}
-        <section className="space-y-2 border border-border rounded-lg p-4 bg-card/30">
-          <h2 className="text-2xl font-semibold text-foreground">Common Mistakes</h2>
-          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-            {commonMistakes[activeClass].map((item, idx) => (
-              <li key={idx}>{item}</li>
-            ))}
-          </ul>
-        </section>
+        <CommonMistakesSection
+          title="Common Mistakes & Why They Happen"
+          mistakes={commonMistakes[activeClass]}
+        />
 
-        {/* Common Use Cases */}
-        <section className="space-y-2 border border-border rounded-lg p-4 bg-card/30">
-          <h2 className="text-2xl font-semibold text-foreground">Common Use Cases</h2>
-          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-            {commonUseCases[activeClass].map((item, idx) => (
-              <li key={idx}>{item}</li>
-            ))}
-          </ul>
-        </section>
-      </main>
-      <Footer />
+        <TipsSection 
+          tips={[
+            { bold: "Always use flex:", text: "Justify-content only works on flex containers" },
+            { bold: "Combine with gap:", text: "Use gap utilities for better spacing between items" },
+            { bold: "Responsive alignment:", text: "Change justify values at different breakpoints" },
+            { bold: "Vertical alignment:", text: "Use align-items for cross-axis alignment" },
+            { bold: "Container width matters:", text: "Justify behavior depends on available space" }
+          ]}
+        />
+      </div>
     </div>
   );
 }

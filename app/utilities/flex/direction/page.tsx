@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import FlexLayout from "../layout";
+import { PageHero } from "@/components/shared/page-hero";
+import { UtilityGrid } from "@/components/shared/utility-grid";
+import { ExampleSection, ExampleCard } from "@/components/shared/example-section";
+import { TipsSection } from "@/components/shared/tips-section";
+import { MentalModelSection } from "@/components/shared/mental-model-section";
+import { CommonMistakesSection } from "@/components/shared/common-mistakes-section";
 import CodeBlock from "@/app/utilities/components/code-block";
 
 type Direction =
@@ -12,12 +17,12 @@ type Direction =
   | "flex-col-reverse";
 
 export default function FlexDirectionPage() {
-  const [copied, setCopied] = useState(false);
+const [copied, setCopied] = useState<string | null>(null);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopied(text);
+    setTimeout(() => setCopied(null), 2000);
   };
 
   const utilities = [
@@ -39,53 +44,61 @@ export default function FlexDirectionPage() {
   <div class="px-4 py-2 bg-slate-700 rounded text-white">Item 3</div>
 </div>`;
 
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <main className="flex-1">
-        {/* readable text color applied site-wide for the page */}
-        <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
-          {/* Header */}
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold">Flex Direction</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl">
-              Control the direction flex items are laid out — and learn how that
-              affects real UI patterns.
-            </p>
-          </div>
+return (
+    <FlexLayout>
+      <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
+        {/* Header */}
+        <PageHero 
+          title="Flex Direction"
+          description="Control the direction flex items are laid out — and learn how that affects real UI patterns."
+        />
 
-          {/* Utilities Grid */}
-          <div className="space-y-6 border-t border-border pt-8">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-bold">Flex Direction Utilities</h2>
-              <p className="text-muted-foreground">
-                Click a utility to copy it.
-              </p>
-            </div>
+        <MentalModelSection
+          title="Understanding Flex Direction"
+          description="Flex direction establishes the main axis along which flex items are laid out, fundamentally affecting layout behavior."
+          features={[
+            "Main axis determines primary layout direction",
+            "Cross axis is perpendicular to main axis for alignment",
+            "Writing mode affects direction interpretation",
+            "Reverse utilities only change visual order, not DOM order",
+            "Direction affects how other flex properties behave"
+          ]}
+          layerAssignment="Layout Direction - Defines main axis and item flow direction"
+          browserBehavior="Browser calculates main axis based on direction and positions items accordingly"
+        />
 
-            <div className="grid md:grid-cols-2 gap-4">
-              {utilities.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => copyToClipboard(item.className)}
-                  className="text-left border border-border rounded-lg p-4 hover:bg-card/50 transition cursor-pointer flex flex-col group"
-                  aria-label={`Copy ${item.className}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <code className="text-black text-sm font-mono text-accent font-semibold">
-                      {item.className}
-                    </code>
-                    <span className="text-xs text-muted-foreground">
-                      {copied === item.className ? "Copied" : "Copy"}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {item.desc}
-                  </p>
-                </button>
-              ))}
-            </div>
-          </div>
+        <CommonMistakesSection
+          mistakes={[
+            {
+              title: "Using flex-direction: column for horizontal layouts",
+              reason: "The opposite of intended layout, causing stacking instead of side-by-side arrangement",
+              example: "<div class=\"flex flex-col\">Horizontal nav items</div>",
+              level: "critical"
+            },
+            {
+              title: "Not testing keyboard order with reverse directions",
+              reason: "Visual reordering breaks accessibility expectations for screen reader and keyboard users",
+              example: "<div class=\"flex-row-reverse\">Important content first in DOM</div>",
+              level: "warning"
+            },
+            {
+              title: "Missing responsive direction changes",
+              reason: "Layouts don't adapt properly between mobile and desktop viewports",
+              example: "<div class=\"flex-row\">Stays horizontal on mobile</div>",
+              level: "info"
+            }
+          ]}
+        />
+
+          <UtilityGrid
+            title="Flex Direction Utilities"
+            items={[
+              { cls: "flex-row", desc: "Row direction (left to right)" },
+              { cls: "flex-col", desc: "Column direction (top to bottom)" },
+              { cls: "flex-row-reverse", desc: "Row reverse (right to left)" },
+              { cls: "flex-col-reverse", desc: "Column reverse (bottom to top)" }
+            ]}
+          />
 
           {/* Interactive Playground */}
           <div className="space-y-4 border-t border-border pt-8">
@@ -384,12 +397,7 @@ export default function FlexDirectionPage() {
             </div>
           </div>
 
-          {/* Real-world annotated examples with reasons */}
-          <div className="space-y-6 border-t border-border pt-8">
-            <h2 className="text-3xl font-bold text-foreground">
-              Real-World Examples — explained
-            </h2>
-
+          <ExampleSection title="Real-World Examples — explained">
             <div className="grid md:grid-cols-2 gap-6">
               {/* 1. Responsive navigation */}
               <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
@@ -816,45 +824,31 @@ export default function FlexDirectionPage() {
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">Accessibility note</h3>
-              <p className="text-sm text-muted-foreground">
-                Reversing visual order (
-                <code className="bg-slate-700 px-1 rounded">*-reverse</code>)
-                doesn't change DOM order — keyboard and screen reader users
-                still navigate the original DOM order. If visual order must
-                match keyboard order, rearrange DOM instead of relying only on
-                reverse utilities.
-              </p>
-            </div>
-          </div>
+          </ExampleSection>
 
-          {/* Tips */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 space-y-3">
-            <h3 className="font-semibold">Summary tips</h3>
-            <ul className="space-y-2 text-muted-foreground text-sm">
-              <li>
-                Use <code className="bg-slate-700 px-1 rounded">flex-row</code>{" "}
-                for horizontal UI,{" "}
-                <code className="bg-slate-700 px-1 rounded">flex-col</code> for
-                stacked UI.
-              </li>
-              <li>
-                Prefer responsive switches (e.g.,{" "}
-                <code className="bg-slate-700 px-1 rounded">md:flex-row</code>)
-                for mobile-first design.
-              </li>
-              <li>
-                Use reverse utilities sparingly — remember accessibility
-                implications.
-              </li>
-            </ul>
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Accessibility note</h3>
+            <p className="text-sm text-muted-foreground">
+              Reversing visual order (
+              <code className="bg-slate-700 px-1 rounded">*-reverse</code>)
+              doesn't change DOM order — keyboard and screen reader users
+              still navigate to original DOM order. If visual order must
+              match keyboard order, rearrange DOM instead of relying only on
+              reverse utilities.
+            </p>
           </div>
+         
+
+          <TipsSection 
+            tips={[
+              { bold: "Direction choice:", text: "Use flex-row for horizontal UI, flex-col for stacked UI" },
+              { bold: "Responsive design:", text: "Prefer responsive switches like md:flex-row for mobile-first layouts" },
+              { bold: "Reverse utilities:", text: "Use sparingly and test keyboard accessibility when using *-reverse" },
+              { bold: "Writing modes:", text: "Consider international layouts where flex-start/flex-end may behave differently" },
+              { bold: "Main axis:", text: "Direction determines main axis - affects justify-content behavior" }
+            ]}
+          />
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </FlexLayout>
   );
 }

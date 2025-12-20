@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import FlexLayout from "../layout";
+import { PageHero } from "@/components/shared/page-hero";
+import { UtilityGrid } from "@/components/shared/utility-grid";
+import { ExampleSection, ExampleCard } from "@/components/shared/example-section";
+import { TipsSection } from "@/components/shared/tips-section";
+import { MentalModelSection } from "@/components/shared/mental-model-section";
+import { CommonMistakesSection } from "@/components/shared/common-mistakes-section";
 import CodeBlock from "@/app/utilities/components/code-block";
 
 type WrapMode = "flex-wrap" | "flex-wrap-reverse" | "flex-nowrap";
@@ -41,50 +46,60 @@ export default function FlexWrapPage() {
   <div class="p-3 rounded bg-slate-700 text-white">Item 5</div>
 </div>`;
 
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
-          {/* Header */}
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold">Flex Wrap</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl">
-              Control whether flex items wrap to multiple lines — useful for
-              galleries, tags, toolbars and responsive card layouts.
-            </p>
-          </div>
+return (
+    <FlexLayout>
+      <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
+        {/* Header */}
+        <PageHero 
+          title="Flex Wrap"
+          description="Control whether flex items wrap to multiple lines — useful for galleries, tags, toolbars and responsive card layouts."
+        />
 
-          {/* Utilities Grid */}
-          <div className="space-y-6 border-t border-border pt-8">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-bold">Flex Wrap Utilities</h2>
-              <p className="text-muted-foreground">
-                Click a utility to copy it.
-              </p>
-            </div>
+          <MentalModelSection
+            title="Understanding Flex Wrap"
+            description="Flex wrap controls whether items stay on a single line or can wrap to multiple lines when container space is limited."
+            features={[
+              "Controls line breaking behavior in flex containers",
+              "Affects how remaining space is calculated",
+              "Works with gap utilities for spacing between lines",
+              "Reverse option changes visual wrapping order",
+              "Essential for responsive grid-like layouts"
+            ]}
+            layerAssignment="Layout Control - Manages item line distribution and overflow"
+            browserBehavior="Browser calculates available space and moves items to new lines when needed"
+          />
 
-            <div className="grid md:grid-cols-3 gap-4">
-              {utilities.map((u) => (
-                <button
-                  key={u.className}
-                  onClick={() => copyToClipboard(u.className)}
-                  className="text-left border border-border rounded-lg p-4 hover:bg-card/50 transition flex flex-col group cursor-pointer"
-                  aria-label={`Copy ${u.className}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <code className="text-black text-sm font-mono text-accent font-semibold">
-                      {u.className}
-                    </code>
-                    <span className="text-xs text-muted-foreground">
-                      {copied === u.className ? "Copied" : "Copy"}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">{u.desc}</p>
-                </button>
-              ))}
-            </div>
-          </div>
+          <UtilityGrid
+            title="Flex Wrap Utilities"
+            items={[
+              { cls: "flex-wrap", desc: "Wrap to multiple lines" },
+              { cls: "flex-wrap-reverse", desc: "Wrap in reverse" },
+              { cls: "flex-nowrap", desc: "Keep items on a single line" }
+            ]}
+          />
+
+          <CommonMistakesSection
+            mistakes={[
+              {
+                title: "Using nowrap without overflow handling",
+                reason: "Items will overflow container and break layout",
+                example: "<div class=\"flex-nowrap\">Too many items for container</div>",
+                level: "critical"
+              },
+              {
+                title: "Not considering gap with wrap",
+                reason: "Gap applies between items and lines, affecting spacing calculations",
+                example: "<div class=\"flex-wrap gap-8\">Unexpected large gaps between rows</div>",
+                level: "warning"
+              },
+              {
+                title: "Forgetting to constrain item widths",
+                reason: "Items may become too small when wrapping in narrow containers",
+                example: "<div class=\"flex-wrap\">Items become tiny</div>",
+                level: "info"
+              }
+            ]}
+          />
 
           {/* Interactive Playground */}
           <div className="space-y-4 border-t border-border pt-8">
@@ -778,18 +793,25 @@ export default function FlexWrapPage() {
                 </div>
               </div>
 
-              {/* Accessibility reminder (full width) */}
-              <div className="md:col-span-2 text-sm text-muted-foreground">
-                <strong>Accessibility reminder:</strong> When items wrap, visual
-                focus order remains DOM order. If wrapping changes how users
-                expect to navigate, ensure tab order and ARIA attributes reflect
-                the expected experience.
-              </div>
+            {/* Accessibility reminder */}
+            <div className="text-sm text-muted-foreground border-t pt-4">
+              <strong>Accessibility reminder:</strong> When items wrap, visual
+              focus order remains DOM order. If wrapping changes how users
+              expect to navigate, ensure tab order and ARIA attributes reflect
+              expected experience.
             </div>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+     
+
+          <TipsSection 
+            tips={[
+              { bold: "Overflow handling:", text: "Always pair flex-nowrap with overflow-x-auto for horizontal scrolling" },
+              { bold: "Item sizing:", text: "Constrain item widths or use basis- to control wrapping behavior" },
+              { bold: "Gap spacing:", text: "Remember gap applies between items and between flex lines" },
+              { bold: "Responsive design:", text: "Use wrap for responsive galleries and tag clouds" },
+              { bold: "Performance:", text: "Flex wrap is GPU-accelerated - prefer over manual grid calculations" }
+            ]}
+          />
+        </div></div></div>
+      </FlexLayout>
   );
 }

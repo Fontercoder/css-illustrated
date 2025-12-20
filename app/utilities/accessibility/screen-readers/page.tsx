@@ -4,6 +4,9 @@
   import Navbar from "@/components/navbar";
   import Footer from "@/components/footer";
   import CodeBlock from "@/app/utilities/components/code-block";
+  import { MentalModelSection } from "@/components/shared/mental-model-section";
+  import { ComparisonTable } from "@/components/shared/comparison-table";
+  import { CommonMistakesSection } from "@/components/shared/common-mistakes-section";
 
   export default function ScreenReadersPage() {
     const [activeType, setActiveType] = useState<"sr-only" | "not-sr-only">("sr-only");
@@ -176,40 +179,47 @@
         <main className="flex-1 max-w-5xl px-8 py-12 space-y-12 text-left">
 
 
-          {/* Quick Comparison Table */}
-                  <b><h1 className="text-2xl font-semibold text-foreground mb-4" > Accessibility: Screen Reader</h1></b>
+          {/* Mental Model Section */}
+          <MentalModelSection
+            title="How Assistive Technology Works"
+            description="Screen readers read the DOM tree"
+            features={[
+              "Element types (button, heading, link)",
+              "Text content (including sr-only)",
+              "ARIA attributes and roles",
+              "Form labels and descriptions"
+            ]}
+            layerAssignment="Screen reader utilities belong to the Content layer - they control what information assistive technology can access without affecting visual layout or shape."
+          />
 
-          <section className="mb-6 border border-border rounded-lg p-4 bg-card/30">
-            <h2 className="text-2xl font-semibold text-foreground mb-4">Quick Comparison: sr-only vs not-sr-only</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-card/50">
-                    <th className="border px-4 py-2">Feature</th>
-                    <th className="border px-4 py-2">sr-only</th>
-                    <th className="border px-4 py-2">not-sr-only</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border px-4 py-2">Visibility</td>
-                    <td className="border px-4 py-2">Hidden visually, readable by screen readers</td>
-                    <td className="border px-4 py-2">Visible to all users</td>
-                  </tr>
-                  <tr>
-                    <td className="border px-4 py-2">Use Cases</td>
-                    <td className="border px-4 py-2">Hidden labels, instructions, live updates</td>
-                    <td className="border px-4 py-2">Alerts, navigation, visible content</td>
-                  </tr>
-                  <tr>
-                    <td className="border px-4 py-2">Accessibility</td>
-                    <td className="border px-4 py-2">Improves screen reader UX</td>
-                    <td className="border px-4 py-2">Works for all users</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
+          {/* Quick Comparison Table */}
+          <ComparisonTable
+            title="Quick Comparison: sr-only vs not-sr-only"
+            columns={["Feature", "sr-only", "not-sr-only"]}
+            rows={[
+              {
+                feature: "Visibility",
+                values: [
+                  "Hidden visually, readable by screen readers",
+                  "Visible to all users"
+                ]
+              },
+              {
+                feature: "Use Cases", 
+                values: [
+                  "Hidden labels, instructions, live updates",
+                  "Alerts, navigation, visible content"
+                ]
+              },
+              {
+                feature: "Accessibility",
+                values: [
+                  "Improves screen reader UX",
+                  "Works for all users"
+                ]
+              }
+            ]}
+          />
 
           {/* Type Selector */}
           <div className="flex gap-4 mb-6">
@@ -233,12 +243,17 @@
             {/* Diagram */}
             {diagrams[activeType]}
 
-            {/* Explanation */}
-            <div className="text-sm text-muted-foreground">
-              {activeType === "sr-only"
-                ? "The sr-only class hides content visually but keeps it accessible to screen readers. Use it for hidden labels, instructions, or live updates."
-                : "Visible content (not sr-only) is readable by everyone. Use for labels, instructions, notifications, and navigation links."}
-            </div>
+            {/* Explanation with Layer Context */}
+            <MentalModelSection
+              title=""
+              description=""
+              features={[]}
+              layerAssignment={activeType === "sr-only" 
+                ? "Content Layer (assistive technology information): The sr-only class hides content visually but keeps it accessible to screen readers. This creates a dual-layer experience where assistive technology receives information that doesn't affect the visual presentation layer."
+                : "Content Layer (assistive technology information): Visible content (not sr-only) serves both visual users and assistive technology. This is the default content layer behavior - information available to everyone through different channels."
+              }
+              browserBehavior="Screen readers ignore CSS display:none but read sr-only content, which uses clip:rect(0,0,0,0) to hide visually while remaining in the accessibility tree."
+            />
 
             {/* Benefits Section */}
             <section className="space-y-2 border border-border rounded-lg p-4 bg-card/30">
@@ -250,6 +265,46 @@
               </ul>
             </section>
 
+            {/* Cross-Reference to Related Concepts */}
+            <section className="space-y-2 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 bg-yellow-50/30 dark:bg-yellow-900/10">
+              <h2 className="text-xl font-semibold text-yellow-700 dark:text-yellow-400">Related Accessibility Concepts</h2>
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p><strong>Screen reader utilities work with:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li><strong>ARIA attributes:</strong> Define roles, states, and properties</li>
+                  <li><strong>Semantic HTML:</strong> Use proper element types (button, nav, main)</li>
+                  <li><strong>Focus management:</strong> Tab order and keyboard navigation</li>
+                  <li><strong>Color contrast:</strong> Ensure text is readable (Text Color utilities)</li>
+                  <li><strong>Touch target size:</strong> Make interactive areas accessible (Spacing utilities)</li>
+                </ul>
+                <p className="mt-3 text-xs">Screen reader utilities are part of a complete accessibility strategy, not a standalone solution.</p>
+              </div>
+            </section>
+
+            {/* ❌ Common Mistakes & Why They Happen */}
+            <CommonMistakesSection
+              mistakes={[
+                {
+                  title: "Forgetting focus:not-sr-only on skip links",
+                  reason: "Screen reader users can't see when the link becomes visible during keyboard navigation.",
+                  example: `<a class="sr-only">Skip to content</a> // Never visible when focused`,
+                  level: 'critical'
+                },
+                {
+                  title: "Using sr-only for content that should be visible",
+                  reason: "You're hiding useful information from sighted users unnecessarily.",
+                  example: `<p class="sr-only">This form is required</p> // Why hide this warning?`,
+                  level: 'warning'
+                },
+                {
+                  title: "Adding sr-only to decorative content",
+                  reason: "Assistive technology users don't need to hear about decorative elements.",
+                  example: `<div class="sr-only">Beautiful background pattern</div> // Use aria-hidden instead`,
+                  level: 'info'
+                }
+              ]}
+            />
+
             {/* Real World Examples */}
             <section className="space-y-6">
               <h2 className="text-2xl font-semibold text-foreground">Real World Examples</h2>
@@ -259,20 +314,14 @@
                     <h3 className="text-lg font-semibold text-foreground">{ex.title}</h3>
                     <p className="text-sm text-muted-foreground">{ex.note}</p>
                   </div>
+                  <div className="text-xs text-muted-foreground mb-2">
+                    {activeType === "sr-only" ? "Content Layer: Information for assistive technology only" : "Content Layer: Information visible to all users"}
+                  </div>
                   <CopyableCode code={ex.code} index={idx} />
                 </div>
               ))}
             </section>
 
-            {/* Common Mistakes */}
-            <section className="space-y-2 border border-border rounded-lg p-4 bg-card/30">
-              <h2 className="text-2xl font-semibold text-foreground">Common Mistakes</h2>
-              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                {commonMistakes[activeType].map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </section>
 
             {/* Common Use Cases */}
             <section className="space-y-2 border border-border rounded-lg p-4 bg-card/30">
@@ -282,6 +331,33 @@
                   <li key={idx}>{item}</li>
                 ))}
               </ul>
+            </section>
+
+            {/* Layer-Specific Rules */}
+            <section className="space-y-2 border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50/30 dark:bg-blue-900/10">
+              <h2 className="text-xl font-semibold text-blue-700 dark:text-blue-400">Content Layer Rules</h2>
+              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                <li><strong>sr-only</strong> must be used for content that screen readers need but sighted users don't</li>
+                <li><strong>not-sr-only</strong> is the default - use it for content everyone should access</li>
+                <li>Combine with <code className="bg-muted px-1 rounded">focus:not-sr-only</code> for interactive elements</li>
+                <li>Use <code className="bg-muted px-1 rounded">aria-hidden</code> for decorative elements, not sr-only</li>
+                <li>Screen reader content should complement, not duplicate, visible content</li>
+              </ul>
+            </section>
+
+            {/* Pre-Ship Checklist */}
+            <section className="space-y-2 border border-green-200 dark:border-green-800 rounded-lg p-4 bg-green-50/30 dark:bg-green-900/10">
+              <h2 className="text-xl font-semibold text-green-700 dark:text-green-400">Pre-Ship Checklist</h2>
+              <div className="text-sm space-y-2">
+                <div className="font-medium">Content Layer Verification:</div>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
+                  <li>[ ] Does sr-only content provide unique value to assistive technology users?</li>
+                  <li>[ ] Are skip links focusable (focus:not-sr-only)?</li>
+                  <li>[ ] Is decorative content using aria-hidden instead of sr-only?</li>
+                  <li>[ ] Does visible content have adequate labels for screen readers?</li>
+                  <li>[ ] Are form inputs properly labeled (visible or sr-only)?</li>
+                </ul>
+              </div>
             </section>
           </div>
         </main>

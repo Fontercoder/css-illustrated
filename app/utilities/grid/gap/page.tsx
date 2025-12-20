@@ -4,6 +4,15 @@ import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import CodeBlock from "@/app/utilities/components/code-block";
+import { PageHero } from "@/components/shared/page-hero";
+import { UtilityGrid } from "@/components/shared/utility-grid";
+import { UtilityPlayground } from "@/components/shared/utility_playground";
+import { ExampleSection, ExampleCard } from "@/components/shared/example-section";
+import { TipsSection } from "@/components/shared/tips-section";
+import { CommonMistakesSection } from "@/components/shared/common-mistakes-section";
+import { MentalModelSection } from "@/components/shared/mental-model-section";
+import { ComparisonTable } from "@/components/shared/comparison-table";
+import { RealWorldExamples } from "@/components/shared/real-world-examples";
 
 type GapMode = "gap" | "gap-x" | "gap-y";
 type LayoutType = "flex" | "grid";
@@ -66,49 +75,103 @@ export default function GapPage() {
       <Navbar />
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
-          {/* Header */}
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold">Gap</h1>
-            <p className="text-lg text-muted-foreground max-w-3xl">
-              The <strong>gap</strong> utilities control the space between
-              children inside a <code>flex</code> or <code>grid</code>{" "}
-              container. Unlike margins, <em>gap</em> is symmetric, predictable
-              and avoids collapsed margin issues. It also responds nicely with
-              layout primitives (grid/flex) and is the preferred way to space
-              items in modern layouts.
-            </p>
+          <PageHero 
+            title="Gap"
+            description="You should reach for gap utilities when you need consistent spacing between child elements in flex or grid containers. Gap creates symmetric space between items without margin collapse issues and works predictably across layout primitives."
+          />
 
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="p-4 bg-slate-200 rounded">
-                <div className="font-semibold">Why gap?</div>
-                <ul className="text-sm text-muted-foreground mt-2 space-y-1">
-                  <li>Keeps spacing consistent between children.</li>
-                  <li>Works for both grid and flex containers.</li>
-                  <li>
-                    Prevents accidental margin collapse and one-sided spacing.
-                  </li>
-                </ul>
-              </div>
+          <MentalModelSection
+            title="Understanding Gap Mechanics"
+            description="Gap is a layout primitive that creates space between flex/grid children without affecting container boundaries or causing margin collapse. It's a parent-controlled spacing system."
+            features={[
+              "Creates symmetric spacing between all children in container",
+              "Applies only to direct flex or grid children",
+              "Doesn't affect container outer margins or padding",
+              "Prevents margin collapse between adjacent elements",
+              "Works with responsive prefixes for breakpoint-specific spacing"
+            ]}
+            layerAssignment="Layout Layer - Controls inter-child spacing distribution"
+            browserBehavior="Browser calculates gap space and distributes it between children in specified axes, reducing available content space accordingly"
+          />
 
-              <div className="p-4 bg-slate-200 rounded">
-                <div className="font-semibold">Browser support notes</div>
-                <div className="text-sm text-muted-foreground mt-2">
-                  gap in grid has been supported for years; gap for flex is
-                  widely supported in modern browsers. If you support very old
-                  browsers, test fallback (margins).
-                </div>
-              </div>
+          <ComparisonTable
+            title="Gap vs Margin: Spacing Approaches"
+            columns={["Property", "Scope", "Collapse Behavior", "Best For", "Responsive Control"]}
+            rows={[
+              {
+                feature: "gap-*",
+                values: ["Container children only", "No collapse", "Even spacing", "gap-2 sm:gap-4"]
+              },
+              {
+                feature: "margin-*", 
+                values: ["Individual elements", "Can collapse", "Asymmetric needs", "m-2 sm:m-4"]
+              },
+              {
+                feature: "space-*", 
+                values: ["Flex children with stack", "No collapse", "Stacked elements", "space-y-2"]
+              }
+            ]}
+          />
 
-              <div className="p-4 bg-slate-200 rounded">
-                <div className="font-semibold">When not to use gap</div>
-                <div className="text-sm text-muted-foreground mt-2">
-                  If children need different spacing on each side or you need
-                  spacing that impacts container edges for layout reasons,
-                  margins may still be appropriate.
-                </div>
-              </div>
-            </div>
-          </div>
+          <CommonMistakesSection
+            mistakes={[
+              {
+                title: "Using gap when asymmetric spacing is needed",
+                reason: "Gap creates symmetric spacing between all children. When items need different spacing on different sides, margins or wrapper elements are more appropriate.",
+                example: `// Problem: Gap applies to all sides equally
+<div class="flex gap-4">
+  <div>Item with tight left spacing needed</div>
+  <div>Item with normal spacing</div>
+  <div>Item with wide right spacing needed</div>
+</div>
+
+// Solution: Use targeted spacing
+<div class="flex">
+  <div class="mr-2">Item with tight left spacing</div>
+  <div class="mx-4">Item with normal spacing</div>
+  <div class="ml-8">Item with wide right spacing</div>
+</div>`,
+                level: "warning"
+              },
+              {
+                title: "Applying gap to non-layout containers",
+                reason: "Gap only works on display: flex, grid, or their inline variants. Applying gap to block containers has no effect.",
+                example: `// Problem: Gap on block container (no effect)
+<div class="gap-4">
+  <div>Item 1</div>
+  <div>Item 2</div>
+</div>
+
+// Solution: Gap needs layout context
+<div class="flex gap-4">  <!-- or grid -->
+  <div>Item 1</div>
+  <div>Item 2</div>
+</div>`,
+                level: "critical"
+              },
+              {
+                title: "Relying on gap for edge spacing",
+                reason: "Gap creates space between children, not between container and viewport or parent. Edge spacing requires margin on the container itself.",
+                example: `// Problem: No space at container edges
+<section class="flex gap-4">
+  <div>Content touches container edge</div>
+  <div>Content touches container edge</div>
+</section>
+
+// Solution: Container padding for edge spacing
+<section class="flex gap-4 p-6">  <!-- Layout + Shape -->
+  <div>Content has breathing room</div>
+  <div>Content has breathing room</div>
+</section>`,
+                level: "warning"
+              }
+            ]}
+          />
+
+          <UtilityGrid
+            title="Gap Utilities"
+            items={utilities}
+          />
 
           {/* Utilities */}
           <div className="space-y-6 border-t border-border pt-8">
@@ -358,12 +421,7 @@ export default function GapPage() {
             </div>
           </div>
 
-          {/* Real-world examples */}
-          <div className="space-y-6 border-t border-border pt-8">
-            <h2 className="text-3xl font-bold">
-              Real-World Examples — visuals & code
-            </h2>
-
+          <ExampleSection title="Real-World Gap Patterns">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Horizontal nav spacing */}
               <div className="border border-border rounded-lg p-4 bg-card/20">
@@ -583,7 +641,7 @@ export default function GapPage() {
                 test with keyboard-only navigation and a screen reader.
               </div>
             </div>
-          </div>
+          </ExampleSection>
 
           {/* Tips */}
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 space-y-3">

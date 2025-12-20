@@ -3,812 +3,341 @@
 import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import CodeBlock from "@/app/utilities/components/code-block";
-
-type AutoRowsMode =
-  | "auto-rows-min"
-  | "auto-rows-max"
-  | "auto-rows-fr"
-  | "auto-rows-auto";
+import ClassGrid from "@/app/utilities/components/class-grid";
+import { UtilityPlayground } from "@/components/shared/utility_playground";
+import { MentalModelSection } from "@/components/shared/mental-model-section";
+import { CommonMistakesSection } from "@/components/shared/common-mistakes-section";
+import { ComparisonTable } from "@/components/shared/comparison-table";
+import { TipsSection, TipItem } from "@/components/shared/tips-section";
+import { ExampleSection, ExampleCard } from "@/components/shared/example-section";
 
 export default function GridAutoRowsPage() {
-  const [copied, setCopied] = useState<string | null>(null);
-
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(text);
-      setTimeout(() => setCopied(null), 1400);
-    } catch {
-      setCopied(null);
-    }
-  };
-
-  const utilities: { className: AutoRowsMode; desc: string }[] = [
-    { className: "auto-rows-min", desc: "Implicit rows sized to min-content" },
-    { className: "auto-rows-max", desc: "Implicit rows sized to max-content" },
-    { className: "auto-rows-fr", desc: "Implicit rows sized using fr units" },
-    { className: "auto-rows-auto", desc: "Implicit rows sized by auto" },
+  const utilities = [
+    { class: "auto-rows-min", description: "Implicit rows sized to min-content" },
+    { class: "auto-rows-max", description: "Implicit rows sized to max-content" },
+    { class: "auto-rows-fr", description: "Implicit rows sized using fr units" },
+    { class: "auto-rows-auto", description: "Implicit rows sized by auto" },
   ];
 
-  // playground controls
-  const [autoRows, setAutoRows] = useState<AutoRowsMode>("auto-rows-min");
-  const [gap, setGap] = useState("gap-4");
-  // Use standard Tailwind heights so JIT/safelist issues are less likely
-  const [containerHeight, setContainerHeight] = useState("h-96");
-  const [items, setItems] = useState(8);
+  // Mental Model for Grid Auto Rows
+  const mentalModel = {
+    title: "Mental Model: Implicit Grid Tracks",
+    description: "Grid auto-rows control the height of rows you don't explicitly define. Think of them as 'default row heights' for overflow content.",
+    features: [
+      "Implicit tracks are created when items exceed explicit grid definition",
+      "auto-rows-min: each row sized to its smallest content (min-content)",
+      "auto-rows-max: each row sized to its largest content (max-content)", 
+      "auto-rows-fr: rows share remaining available height as fractions",
+      "auto-rows-auto: browser's default auto sizing algorithm"
+    ],
+    layerAssignment: "Layout layer - controls track sizing within CSS Grid coordinate system",
+    browserBehavior: "Implicit tracks follow minmax(auto, min-content) by default. auto-rows-* overrides this algorithm for all implicit rows."
+  };
 
-  const playgroundMarkup = `<div class="grid grid-flow-row ${autoRows} ${gap} ${containerHeight}">
+  // Common Mistakes
+  const commonMistakes = [
+    {
+      title: "Using auto-rows-fr without container height",
+      reason: "Fractional units need available space to distribute. Without height, rows collapse to zero.",
+      example: `<div class="grid auto-rows-fr">
+  <div>Row 1</div>
+  <div>Row 2</div>
+</div>`,
+      level: "critical" as const
+    },
+    {
+      title: "Expecting auto-rows to affect explicit rows",
+      reason: "auto-rows-* only controls implicit tracks. Explicit grid-template-rows take precedence.",
+      example: `<div class="grid grid-rows-[100px] auto-rows-fr">
+  <div>This row stays 100px (explicit)</div>
+  <div>This row gets fr sizing (implicit)</div>
+</div>`,
+      level: "warning" as const
+    },
+    {
+      title: "Mixing content-based and fraction-based auto-rows",
+      reason: "auto-rows-min/max adapt to content, auto-rows-fr ignores content height. Choose one behavior per grid.",
+      example: `<div class="grid auto-rows-min auto-rows-fr">
+  <!-- Only the last auto-rows-* value applies -->
+</div>`,
+      level: "warning" as const
+    },
+    {
+      title: "Forgetting grid-flow direction",
+      reason: "auto-rows work with grid-flow-row (default). grid-flow-column creates implicit columns instead.",
+      example: `<div class="grid grid-flow-col auto-rows-min">
+  <!-- This creates implicit columns, not rows -->
+</div>`,
+      level: "info" as const
+    }
+  ];
+
+  // Comparison Table
+  const comparisonData = {
+    title: "Auto Rows Variants Comparison",
+    columns: ["Variant", "Sizing Algorithm", "Use Case", "Height Constraint"],
+    rows: [
+      {
+        feature: "auto-rows-min",
+        values: ["min-content", "Dynamic content", "Feeds, lists, chat", "Content-driven"]
+      },
+      {
+        feature: "auto-rows-max", 
+        values: ["max-content", "Largest content in row", "Mixed content grids", "Content-driven"]
+      },
+      {
+        feature: "auto-rows-fr",
+        values: ["fractional units", "Equal height distribution", "Split layouts", "Container-driven"]
+      },
+      {
+        feature: "auto-rows-auto",
+        values: ["auto algorithm", "Browser default", "Fallback behavior", "Content + container"]
+      }
+    ]
+  };
+
+  // Utility Playground Configuration
+  const playgroundConfig = {
+    title: "Interactive Playground",
+    description: "Explore how different auto-rows values affect implicit grid track sizing.",
+    options: ["auto-rows-min", "auto-rows-max", "auto-rows-fr", "auto-rows-auto"],
+    defaultValue: "auto-rows-min",
+    buildMarkup: (value: string, customClasses?: string) => {
+      const gap = customClasses?.match(/gap-\w+/)?.[0] || "gap-4";
+      const height = customClasses?.match(/h-\w+/)?.[0] || "h-auto";
+      
+      return `<div class="grid grid-flow-row ${value} ${gap} ${height}">
   <!-- implicit rows created as you add items -->
   <div class="p-3 bg-slate-700 rounded text-white">Item</div>
-  ...
+  <div class="p-3 bg-slate-700 rounded text-white">Item with more content</div>
+  <div class="p-3 bg-slate-700 rounded text-white">Short</div>
 </div>`;
+    },
+    renderPreview: (value: string, customClasses?: string) => {
+      const gap = customClasses?.match(/gap-\w+/)?.[0] || "gap-4";
+      const height = customClasses?.match(/h-\w+/)?.[0] || "h-64";
+      
+      return (
+        <div className={`grid grid-flow-row ${value} ${gap} ${height}`}>
+          <div className="p-3 bg-slate-700 rounded text-white">Short</div>
+          <div className="p-3 bg-slate-700 rounded text-white">Item with more content that demonstrates row sizing</div>
+          <div className="p-3 bg-slate-700 rounded text-white">Medium</div>
+          <div className="p-3 bg-slate-700 rounded text-white">Very short</div>
+          <div className="p-3 bg-slate-700 rounded text-white">Another item with variable content length</div>
+        </div>
+      );
+    },
+    optionLabel: (v: string) => v.replace("auto-rows-", ""),
+    enableCodeEditor: true,
+    defaultCustomClasses: "gap-4 h-64"
+  };
+
+  // Real World Examples Configuration
+  const realWorldExamples = (
+    <ExampleSection title="Real-World Examples">
+      {/* Vertical news feed */}
+      <ExampleCard
+        title="Vertical news feed (auto-rows-min)"
+        copyText={`<div class="grid grid-flow-row auto-rows-min gap-3">...</div>`}
+        code={`<div class="grid grid-flow-row auto-rows-min gap-3">
+  <article>Short headline</article>
+  <article>Longer story with details</article>
+</div>`}
+        description={
+          <>
+            Use{" "}
+            <code className="bg-slate-700 px-1 rounded">auto-rows-min</code>{" "}
+            for feeds where each item should take only its required height.
+            Perfect for news feeds, activity logs, and message threads.
+          </>
+        }
+      >
+        <div className="bg-slate-800 rounded p-3 h-48 overflow-auto">
+          <div className="grid grid-flow-row auto-rows-min gap-2">
+            <article className="p-2 bg-slate-700 rounded text-slate-200 text-sm">
+              <div className="font-semibold">Breaking: Update Released</div>
+              <div className="text-xs text-slate-400">Latest version now available</div>
+            </article>
+            <article className="p-2 bg-slate-700 rounded text-slate-200 text-sm">
+              <div className="font-semibold">Community Event Announcement</div>
+              <div className="text-xs text-slate-400">Join us this weekend for the annual meetup where we'll discuss the latest developments in the field and share experiences from various projects.</div>
+            </article>
+            <article className="p-2 bg-slate-700 rounded text-slate-200 text-sm">
+              <div className="font-semibold">Quick Note</div>
+              <div className="text-xs text-slate-400">Server maintenance complete</div>
+            </article>
+          </div>
+        </div>
+      </ExampleCard>
+
+      {/* Equal height split */}
+      <ExampleCard
+        title="Two-row split layout (auto-rows-fr)"
+        copyText={`<div class="grid grid-flow-row auto-rows-fr h-96 gap-4">...</div>`}
+        code={`<div class="grid grid-flow-row auto-rows-fr h-96 gap-4">
+  <div>Top pane (1fr)</div>
+  <div>Bottom pane (1fr)</div>
+</div>`}
+        description={
+          <>
+            Use{" "}
+            <code className="bg-slate-700 px-1 rounded">auto-rows-fr</code>{" "}
+            to split available height between implicit rows evenly. Great for split views and dashboard layouts.
+          </>
+        }
+      >
+        <div className="bg-slate-800 rounded p-3 h-48 overflow-hidden">
+          <div className="grid grid-flow-row auto-rows-fr gap-3 h-full">
+            <div className="bg-slate-700 rounded p-4 text-slate-200 flex items-center justify-center text-sm">
+              Top Pane (1fr - Equal height)
+            </div>
+            <div className="bg-slate-700 rounded p-4 text-slate-200 flex items-center justify-center text-sm">
+              Bottom Pane (1fr - Equal height)
+            </div>
+          </div>
+        </div>
+      </ExampleCard>
+
+      {/* Masonry-like grid */}
+      <ExampleCard
+        title="Masonry-like layout (custom auto-rows)"
+        copyText={`<div class="grid auto-rows-[8rem] gap-4">...</div>`}
+        code={`<div class="grid auto-rows-[8rem] gap-4" style="grid-template-columns: repeat(3, minmax(0, 1fr))">
+  <div class="row-span-2">Tall item</div>
+  <div class="row-span-1">Regular</div>
+</div>`}
+        description={
+          <>
+            Combine fixed auto-rows height with{" "}
+            <code className="bg-slate-700 px-1 rounded">row-span-*</code>{" "}
+            to create masonry-like layouts using CSS Grid.
+          </>
+        }
+      >
+        <div className="bg-slate-800 rounded p-3 h-48 overflow-hidden">
+          <div 
+            className="grid auto-rows-[3rem] gap-2 h-full"
+            style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}
+          >
+            <div className="row-span-2 bg-slate-700 rounded flex items-center justify-center text-xs text-slate-300">Tall</div>
+            <div className="row-span-1 bg-slate-700 rounded flex items-center justify-center text-xs text-slate-300">Short</div>
+            <div className="row-span-1 bg-slate-700 rounded flex items-center justify-center text-xs text-slate-300">Item</div>
+            <div className="row-span-1 bg-slate-700 rounded flex items-center justify-center text-xs text-slate-300">Here</div>
+          </div>
+        </div>
+      </ExampleCard>
+
+      {/* Chat list */}
+      <ExampleCard
+        title="Chat interface (auto-rows-min)"
+        copyText={`<div class="flex flex-col h-96">
+  <div class="flex-1 overflow-auto">
+    <div class="grid grid-flow-row auto-rows-min gap-3">...</div>
+  </div>
+  <div class="p-3 border-t">Input</div>
+</div>`}
+        description={
+          <>
+            Messages use{" "}
+            <code className="bg-slate-700 px-1 rounded">auto-rows-min</code>{" "}
+            while input stays fixed. Perfect for chat and comment interfaces.
+          </>
+        }
+      >
+        <div className="bg-slate-800 rounded p-3 h-48 flex flex-col">
+          <div className="flex-1 overflow-auto mb-2">
+            <div className="grid grid-flow-row auto-rows-min gap-2">
+              <div className="p-2 bg-slate-700 rounded text-slate-200 text-xs">
+                User: Hey there!
+              </div>
+              <div className="p-2 bg-slate-700 rounded text-slate-200 text-xs">
+                You: Hi! How can I help you today? This is a longer message to show how rows expand.
+              </div>
+              <div className="p-2 bg-slate-700 rounded text-slate-200 text-xs">
+                User: Thanks for asking!
+              </div>
+            </div>
+          </div>
+          <div className="flex-shrink-0">
+            <div className="bg-slate-700 rounded p-2 text-xs text-slate-400">Type a message...</div>
+          </div>
+        </div>
+      </ExampleCard>
+
+      {/* Accessibility note */}
+      <div className="md:col-span-2 text-sm text-muted-foreground border-t border-border pt-4">
+        <strong>Accessibility reminder:</strong> auto-rows affects layout only. 
+        Keyboard/tab order and screen reader reading order follow DOM order. 
+        When using visual reordering with spans, ensure ARIA/focus management matches the visual experience.
+      </div>
+    </ExampleSection>
+  );
+
+  // Tips Section
+  const tips = [
+    {
+      title: "Container height is required for auto-rows-fr",
+      content: "Fractional units need available space. Without height, auto-rows-fr creates zero-height rows."
+    },
+    {
+      title: "auto-rows only affects implicit tracks",
+      content: "Explicit grid-template-rows take precedence. auto-rows-* won't override explicitly defined rows."
+    },
+    {
+      title: "Use custom values for fixed row heights",
+      content: "auto-rows-[8rem] creates fixed-height implicit tracks. Combine with row-span-* for masonry layouts."
+    },
+    {
+      title: "Grid-flow direction matters",
+      content: "auto-rows work with grid-flow-row (default). grid-flow-column creates implicit columns instead."
+    },
+    {
+      title: "Min-max fallbacks provide safety",
+      content: "auto-rows-[minmax(2rem,8rem)] ensures rows never shrink below minimum content needs."
+    }
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
-          {/* Header */}
+          {/* Hero Section */}
           <div className="space-y-4">
             <h1 className="text-5xl font-bold">Grid — Auto Rows</h1>
             <p className="text-lg text-muted-foreground max-w-3xl">
-              Control the size of implicitly-created grid rows. Useful for
-              vertical galleries, timelines, chat lists, masonry-like layouts
-              and full-height row distributions.
+              Control the size of implicitly-created grid rows. You should reach for this utility when you need dynamic row heights for feeds, split layouts, or masonry-style grids. Auto rows belong to the <strong>Layout layer</strong> and should be applied to the <strong>grid container</strong>.
             </p>
           </div>
 
-          {/* Quick comparison */}
-          <div className="border border-border rounded-lg p-4 bg-card/20">
-            <h2 className="text-2xl font-semibold">Quick comparison</h2>
-            <div className="mt-3 grid md:grid-cols-4 gap-3 text-sm">
-              <div className="p-3 bg-slate-200 rounded">
-                <div className="font-medium">auto-rows-min</div>
-                <div className="text-muted-foreground mt-1">
-                  Rows size to smallest content — good for dynamic height items.
-                </div>
-              </div>
-              <div className="p-3 bg-slate-200 rounded">
-                <div className="font-medium">auto-rows-max</div>
-                <div className="text-muted-foreground mt-1">
-                  Rows size to largest content in that implicit row.
-                </div>
-              </div>
-              <div className="p-3 bg-slate-200 rounded">
-                <div className="font-medium">auto-rows-fr</div>
-                <div className="text-muted-foreground mt-1">
-                  Rows share available height using fractional units — good for
-                  full-height splits.
-                </div>
-              </div>
-              <div className="p-3 bg-slate-200 rounded">
-                <div className="font-medium">auto-rows-auto</div>
-                <div className="text-muted-foreground mt-1">
-                  Default browser sizing (auto).
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Mental Model Section */}
+          <MentalModelSection {...mentalModel} />
 
-          {/* Utilities */}
-          <div className="space-y-6 border-t border-border pt-8">
+          {/* Common Mistakes */}
+          <CommonMistakesSection mistakes={commonMistakes} />
+
+          {/* Comparison Table */}
+          <ComparisonTable {...comparisonData} />
+
+          {/* Utilities Grid */}
+          <section className="space-y-6 border-t border-border pt-8">
             <div className="space-y-4">
               <h2 className="text-3xl font-bold">Auto Rows Utilities</h2>
               <p className="text-muted-foreground">
                 Click a utility to copy it to clipboard.
               </p>
             </div>
-
-            <div className="grid md:grid-cols-4 gap-4">
-              {utilities.map((u) => (
-                <button
-                  key={u.className}
-                  onClick={() => copyToClipboard(u.className)}
-                  className="text-left border border-border rounded-lg p-4 hover:bg-card/50 transition flex flex-col group"
-                  aria-label={`Copy ${u.className}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <code className="text-black text-sm font-mono text-accent font-semibold">
-                      {u.className}
-                    </code>
-                    <span className="text-xs text-muted-foreground">
-                      {copied === u.className ? "Copied" : "Copy"}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">{u.desc}</p>
-                </button>
-              ))}
-            </div>
-          </div>
+            <ClassGrid classes={utilities} />
+          </section>
 
           {/* Interactive Playground */}
-          <div className="space-y-4 border-t border-border pt-8">
-            <h2 className="text-3xl font-bold">Interactive Playground</h2>
-            <p className="text-muted-foreground">
-              Toggle{" "}
-              <code className="bg-slate-700 px-1 rounded">auto-rows-*</code>,
-              gap, container height and item count. Buttons only — no selects.
-            </p>
+          <UtilityPlayground {...playgroundConfig} />
 
-            <div className="grid md:grid-cols-3 gap-4">
-              {/* Controls */}
-              <div className="space-y-3 md:col-span-1">
-                <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
-                    Auto rows
-                  </label>
-                  <div className="flex gap-2 flex-wrap">
-                    {(
-                      [
-                        "auto-rows-min",
-                        "auto-rows-max",
-                        "auto-rows-fr",
-                        "auto-rows-auto",
-                      ] as AutoRowsMode[]
-                    ).map((m) => (
-                      <button
-                        key={m}
-                        onClick={() => setAutoRows(m)}
-                        className={`px-3 py-1 rounded border text-sm ${
-                          autoRows === m
-                            ? "border-blue-500 bg-blue-500/10"
-                            : "border-border"
-                        }`}
-                      >
-                        {m.replace("auto-rows-", "")}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+          {/* Real World Examples */}
+          {realWorldExamples}
 
-                <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
-                    Gap
-                  </label>
-                  <div className="flex gap-2">
-                    {["gap-2", "gap-4", "gap-6"].map((g) => (
-                      <button
-                        key={g}
-                        onClick={() => setGap(g)}
-                        className={`px-3 py-1 rounded border text-sm ${
-                          gap === g
-                            ? "border-blue-500 bg-blue-500/10"
-                            : "border-border"
-                        }`}
-                      >
-                        {g.replace("gap-", "")}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
-                    Container height
-                  </label>
-                  <div className="flex gap-2">
-                    {[
-                      { label: "large (h-96)", cls: "h-96" },
-                      { label: "medium (h-64)", cls: "h-64" },
-                      { label: "auto", cls: "h-auto" },
-                    ].map((c) => (
-                      <button
-                        key={c.cls}
-                        onClick={() => setContainerHeight(c.cls)}
-                        className={`px-3 py-1 rounded border text-sm ${
-                          containerHeight === c.cls
-                            ? "border-blue-500 bg-blue-500/10"
-                            : "border-border"
-                        }`}
-                      >
-                        {c.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
-                    Number of items
-                  </label>
-                  <div className="flex gap-2">
-                    {[4, 6, 8, 12].map((n) => (
-                      <button
-                        key={n}
-                        onClick={() => setItems(n)}
-                        className={`px-3 py-1 rounded border text-sm ${
-                          items === n
-                            ? "border-blue-500 bg-blue-500/10"
-                            : "border-border"
-                        }`}
-                      >
-                        {n}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Playground preview */}
-              <div className="md:col-span-2 space-y-3">
-                <div className="border border-border rounded-lg p-4 bg-card/30">
-                  <div className="mb-3 flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-semibold">Playground</div>
-                      <div className="text-xs text-muted-foreground">
-                        Live preview of implicit rows
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 items-center">
-                      <div className="text-xs text-muted-foreground">
-                        Markup
-                      </div>
-                      <button
-                        onClick={() => copyToClipboard(playgroundMarkup)}
-                        className="text-xs px-3 py-1 rounded bg-muted/10 hover:bg-muted/20"
-                      >
-                        Copy markup
-                      </button>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`rounded p-4 bg-slate-800 overflow-auto ${containerHeight}`}
-                    aria-live="polite"
-                  >
-                    <div
-                      className={`grid grid-flow-row ${autoRows} ${gap} ${
-                        autoRows === "auto-rows-auto" ? "" : ""
-                      }`}
-                    >
-                      {Array.from({ length: items }).map((_, i) => (
-                        <div
-                          key={i}
-                          className="p-3 bg-slate-700 rounded text-white min-h-[48px] flex items-center justify-center text-center"
-                        >
-                          Item {i + 1}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground mt-3">
-                    <strong>Note:</strong>{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-min
-                    </code>{" "}
-                    sizes rows to the smallest content;{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-max
-                    </code>{" "}
-                    to the largest;{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-fr
-                    </code>{" "}
-                    distributes available height with fractions (useful for
-                    equal-height split rows);{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-auto
-                    </code>{" "}
-                    uses default browser sizing.
-                  </p>
-
-                  <CodeBlock code={playgroundMarkup} language="jsx" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Real-world examples with visuals */}
-          <div className="space-y-6 border-t border-border pt-8">
-            <h2 className="text-3xl font-bold">
-              Real-World Examples — visuals & code
-            </h2>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Vertical news feed (auto-rows-min) */}
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Vertical news feed (dynamic heights)
-                  </h3>
-                  <button
-                    onClick={() =>
-                      copyToClipboard("grid grid-flow-row auto-rows-min gap-3")
-                    }
-                    className="text-xs px-2 py-1 rounded bg-muted/10"
-                  >
-                    Copy
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 rounded p-3 overflow-auto h-64">
-                  <div className="grid grid-flow-row auto-rows-min gap-3">
-                    <article className="p-3 bg-slate-700 rounded text-slate-200">
-                      <div className="font-semibold">Short headline</div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        One-liner summary
-                      </div>
-                    </article>
-                    <article className="p-3 bg-slate-700 rounded text-slate-200">
-                      <div className="font-semibold">
-                        Longer headline with more detail to show row expansion
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        This story includes a longer summary that demonstrates
-                        taller row sizing.
-                      </div>
-                    </article>
-                    <article className="p-3 bg-slate-700 rounded text-slate-200">
-                      <div className="font-semibold">Another update</div>
-                    </article>
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <CodeBlock
-                    language="jsx"
-                    code={`<div class="grid grid-flow-row auto-rows-min gap-3">\n  <article>Short</article>\n  <article>Long content — taller row</article>\n</div>`}
-                  />
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Use{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-min
-                    </code>{" "}
-                    for feeds where each item should take only required height.
-                  </p>
-                </div>
-              </div>
-
-              {/* Full-height split (auto-rows-fr) */}
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Two-row split (equal rows)
-                  </h3>
-                  <button
-                    onClick={() =>
-                      copyToClipboard(
-                        "grid grid-flow-row auto-rows-fr gap-4 h-96"
-                      )
-                    }
-                    className="text-xs px-2 py-1 rounded bg-muted/10"
-                  >
-                    Copy
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 rounded p-3 overflow-hidden h-64">
-                  <div className="grid grid-flow-row auto-rows-fr gap-4 h-full">
-                    <div className="bg-slate-700 rounded p-4 text-slate-200 flex items-center justify-center">
-                      Top pane (1fr)
-                    </div>
-                    <div className="bg-slate-700 rounded p-4 text-slate-200 flex items-center justify-center">
-                      Bottom pane (1fr)
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <CodeBlock
-                    language="jsx"
-                    code={`<div class="grid grid-flow-row auto-rows-fr h-[400px] gap-4">\n  <div>Pane 1</div>\n  <div>Pane 2</div>\n</div>`}
-                  />
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Use{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-fr
-                    </code>{" "}
-                    to split available height between implicit rows evenly.
-                  </p>
-                </div>
-              </div>
-
-              {/* Masonry-like with row-span + auto-rows (pseudo-masonry) */}
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Masonry-like grid (row spans)
-                  </h3>
-                  <button
-                    onClick={() =>
-                      copyToClipboard(
-                        "grid grid-flow-row auto-rows-[8rem] gap-4"
-                      )
-                    }
-                    className="text-xs px-2 py-1 rounded bg-muted/10"
-                  >
-                    Copy
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 rounded p-3 overflow-auto h-64">
-                  <div
-                    className="grid grid-flow-row auto-rows-[8rem] gap-4"
-                    style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}
-                  >
-                    <div className="row-span-2 bg-slate-700 rounded p-3" />
-                    <div className="row-span-1 bg-slate-700 rounded p-3" />
-                    <div className="row-span-1 bg-slate-700 rounded p-3" />
-                    <div className="row-span-2 bg-slate-700 rounded p-3" />
-                    <div className="row-span-1 bg-slate-700 rounded p-3" />
-                    <div className="row-span-1 bg-slate-700 rounded p-3" />
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Simulate masonry with a fixed implicit row size and varied{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      row-span-*
-                    </code>{" "}
-                    values.
-                  </p>
-                </div>
-              </div>
-              
-              {/* Admin activity list (compact) */}
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Admin activity list (compact)
-                  </h3>
-                  <button
-                    onClick={() =>
-                      copyToClipboard("grid grid-flow-row auto-rows-min gap-2")
-                    }
-                    className="text-xs px-2 py-1 rounded bg-muted/10"
-                  >
-                    Copy
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 rounded p-3 overflow-auto h-56">
-                  <div className="grid grid-flow-row auto-rows-min gap-2">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-3 p-2 bg-slate-700 rounded text-slate-200"
-                      >
-                        <div className="w-8 h-8 bg-slate-600 rounded-full" />
-                        <div className="flex-1">
-                          <div className="font-semibold">
-                            User {i + 1} — action
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            2 hours ago
-                          </div>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          Info
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <p className="text-sm text-muted-foreground">
-                    Compact rows using{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-min
-                    </code>{" "}
-                    keep lists dense and scannable.
-                  </p>
-                </div>
-              </div>
-
-              {/* Timeline with aria-live (auto-rows-min) */}
-              <div className="md:col-span-2 border border-border rounded-lg p-4 bg-card/20">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Accessible timeline / log
-                  </h3>
-                  <button
-                    onClick={() =>
-                      copyToClipboard(
-                        '<div class="grid grid-flow-row auto-rows-min gap-3" role="list">...'
-                      )
-                    }
-                    className="text-xs px-2 py-1 rounded bg-muted/10"
-                  >
-                    Copy
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 rounded p-3 overflow-auto h-56">
-                  <div
-                    className="grid grid-flow-row auto-rows-min gap-3"
-                    role="list"
-                    aria-label="Event timeline"
-                  >
-                    <div
-                      role="listitem"
-                      className="p-3 bg-slate-700 rounded text-slate-200"
-                    >
-                      <div className="font-semibold">
-                        2025-11-10 — Deployment
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        Deployment to production succeeded.
-                      </div>
-                    </div>
-                    <div
-                      role="listitem"
-                      className="p-3 bg-slate-700 rounded text-slate-200"
-                    >
-                      <div className="font-semibold">
-                        2025-10-05 — Feature shipped
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <p className="text-sm text-muted-foreground">
-                    For live timelines, use ARIA roles and ensure updates are
-                    announced when appropriate (e.g.,{" "}
-                    <code className="bg-slate-700 px-1 rounded">aria-live</code>
-                    ).
-                  </p>
-                </div>
-              </div>
-
-
-              {/* Chat with pinned input */}
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Chat list with pinned input
-                  </h3>
-                  <button
-                    onClick={() =>
-                      copyToClipboard(
-                        '<!-- messages: auto-rows-min; input fixed -->\n<div class="flex flex-col h-96">\n  <div class="overflow-auto">\n    <div class="grid grid-flow-row auto-rows-min gap-3">...</div>\n  </div>\n  <div class="flex-shrink-0 p-3">Input area</div>\n</div>'
-                      )
-                    }
-                    className="text-xs px-2 py-1 rounded bg-muted/10"
-                  >
-                    Copy
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 rounded p-3 h-64 flex flex-col">
-                  <div className="overflow-auto mb-3">
-                    <div className="grid grid-flow-row auto-rows-min gap-3">
-                      <div className="p-2 bg-slate-700 rounded text-slate-200">
-                        User: Hey — short message
-                      </div>
-                      <div className="p-3 bg-slate-700 rounded text-slate-200">
-                        You: Longer reply that expands the row with more text to
-                        show dynamic sizing.
-                      </div>
-                      <div className="p-2 bg-slate-700 rounded text-slate-200">
-                        User: Another short message
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <input
-                      className="w-full px-3 py-2 rounded border bg-slate-700 text-white"
-                      placeholder="Type a message..."
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <p className="text-sm text-muted-foreground">
-                    Keep the input fixed with{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      flex-shrink-0
-                    </code>{" "}
-                    while messages use{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-min
-                    </code>
-                    .
-                  </p>
-                </div>
-              </div>
-
-              {/* Image rows with captions (variable heights) */}
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Image list with captions
-                  </h3>
-                  <button
-                    onClick={() =>
-                      copyToClipboard("grid grid-flow-row auto-rows-max gap-3")
-                    }
-                    className="text-xs px-2 py-1 rounded bg-muted/10"
-                  >
-                    Copy
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 rounded p-3 overflow-auto h-64">
-                  <div className="grid grid-flow-row auto-rows-max gap-3">
-                    <figure className="bg-slate-700 rounded p-2">
-                      <div className="w-full h-36 bg-slate-600 rounded" />
-                      <figcaption className="mt-2 text-slate-200">
-                        Short caption
-                      </figcaption>
-                    </figure>
-                    <figure className="bg-slate-700 rounded p-2">
-                      <div className="w-full h-56 bg-slate-600 rounded" />
-                      <figcaption className="mt-2 text-slate-200">
-                        Longer caption showing a taller row
-                      </figcaption>
-                    </figure>
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <p className="text-sm text-muted-foreground">
-                    Use{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-max
-                    </code>{" "}
-                    when some items (images + captions) are taller and you want
-                    rows sized for the tallest content.
-                  </p>
-                </div>
-              </div>
-
-
-              {/* Expandable FAQ / Accordion-like */}
-              <div className="md:col-span-2 border border-border rounded-lg p-4 bg-card/20">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Expandable FAQ (rows expand)
-                  </h3>
-                  <button
-                    onClick={() =>
-                      copyToClipboard("grid grid-flow-row auto-rows-min gap-3")
-                    }
-                    className="text-xs px-2 py-1 rounded bg-muted/10"
-                  >
-                    Copy
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 rounded p-3 overflow-auto h-64">
-                  <div className="grid grid-flow-row auto-rows-min gap-3">
-                    <details className="p-3 bg-slate-700 rounded text-slate-200">
-                      <summary className="font-semibold cursor-pointer">
-                        What is auto-rows-min?
-                      </summary>
-                      <div className="mt-2 text-sm text-muted-foreground">
-                        It sizes rows to the smallest content height needed.
-                      </div>
-                    </details>
-                    <details className="p-3 bg-slate-700 rounded text-slate-200">
-                      <summary className="font-semibold cursor-pointer">
-                        How to split equal height rows?
-                      </summary>
-                      <div className="mt-2 text-sm text-muted-foreground">
-                        Use auto-rows-fr with an explicit container height.
-                      </div>
-                    </details>
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <p className="text-sm text-muted-foreground">
-                    Expandable rows naturally change height —{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      auto-rows-min
-                    </code>{" "}
-                    adapts to that.
-                  </p>
-                </div>
-              </div>
-
-              {/* Accessibility note (full width) */}
-              <div className="md:col-span-2 text-sm text-muted-foreground">
-                <strong>Accessibility reminder:</strong> implicit rows affect
-                layout only — keyboard/tab order and screen reader reading order
-                follow DOM order. If you visually reorder with spans or move
-                focus, ensure ARIA/focus management matches the visual
-                experience.
-              </div>
-            </div>
-          </div>
-
-          {/* Side-by-side comparison */}
-          <div className="space-y-6 border-t border-border pt-8">
-            <h2 className="text-3xl font-bold">Side-by-side comparison</h2>
-            <p className="text-muted-foreground">
-              Compare{" "}
-              <code className="bg-slate-700 px-1 rounded">auto-rows-min</code>{" "}
-              and{" "}
-              <code className="bg-slate-700 px-1 rounded">auto-rows-fr</code>.
-            </p>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <div className="font-semibold mb-3">
-                  auto-rows-min (content-sized)
-                </div>
-                <div className="bg-slate-800 rounded p-3 overflow-auto h-48">
-                  <div className="grid grid-flow-row auto-rows-min gap-3">
-                    <div className="p-2 bg-slate-700 rounded text-slate-200">
-                      Short
-                    </div>
-                    <div className="p-4 bg-slate-700 rounded text-slate-200">
-                      A taller item with more text
-                    </div>
-                    <div className="p-2 bg-slate-700 rounded text-slate-200">
-                      Small
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border border-border rounded-lg p-4 bg-card/20">
-                <div className="font-semibold mb-3">
-                  auto-rows-fr (equal share of height)
-                </div>
-                <div className="bg-slate-800 rounded p-3 overflow-hidden h-48">
-                  <div className="grid grid-flow-row auto-rows-fr gap-3 h-full">
-                    <div className="p-2 bg-slate-700 rounded text-slate-200 flex items-center justify-center">
-                      Row 1
-                    </div>
-                    <div className="p-2 bg-slate-700 rounded text-slate-200 flex items-center justify-center">
-                      Row 2
-                    </div>
-                    <div className="p-2 bg-slate-700 rounded text-slate-200 flex items-center justify-center">
-                      Row 3
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-sm text-muted-foreground">
-              Pick <strong>auto-rows-min</strong> for content-driven rows, and{" "}
-              <strong>auto-rows-fr</strong> when you need rows to share
-              available height.
-            </div>
-          </div>
-
-          {/* Tips & best practices */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 space-y-3">
-            <h3 className="font-semibold">Tips, pitfalls & best practices</h3>
-            <ul className="space-y-2 text-muted-foreground text-sm">
-              <li>
-                <strong>Explicit heights:</strong>{" "}
-                <code className="bg-slate-700 px-1 rounded">auto-rows-fr</code>{" "}
-                requires a container height (or parent height) to distribute
-                space — otherwise rows collapse to zero fractional size.
-              </li>
-              <li>
-                <strong>Masonry:</strong> To mimic masonry, set an explicit
-                auto-rows size (e.g.,{" "}
-                <code className="bg-slate-700 px-1 rounded">
-                  auto-rows-[8rem]
-                </code>
-                ) and use{" "}
-                <code className="bg-slate-700 px-1 rounded">row-span-*</code> on
-                children.
-              </li>
-              <li>
-                <strong>Use min widths/heights:</strong> combine with{" "}
-                <code className="bg-slate-700 px-1 rounded">min-h-[]</code> for
-                sensible minimum item heights.
-              </li>
-              <li>
-                <strong>Virtualize long lists:</strong> for hundreds of items in
-                a scrollable area, use virtualization to maintain performance.
-              </li>
-              <li>
-                <strong>Accessibility:</strong> ensure logical DOM order and use
-                ARIA roles/labels for lists/timelines.
-              </li>
-            </ul>
-          </div>
+          {/* Tips Section */}
+          <TipsSection tips={tips} />
         </div>
       </main>
       <Footer />

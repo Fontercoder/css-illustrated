@@ -1,4 +1,4 @@
-interface UtilityData {
+export interface UtilityData {
   title: string
   description: string
   classes: { class: string; description: string }[]
@@ -766,15 +766,20 @@ export const flexGrowUtilities: UtilityData = {
 // Flex Shrink Utilities
 export const flexShrinkUtilities: UtilityData = {
   title: "Flex Shrink",
-  description: "Control how flex items shrink when space is constrained.",
+  description: "Control how flex items shrink when space is constrained. flex-shrink determines how items contract when container is smaller than their natural size.",
   classes: [
-    { class: "flex-shrink-0", description: "flex-shrink: 0 (no shrinking)" },
-    { class: "flex-shrink", description: "flex-shrink: 1 (shrink proportionally)" },
+    { class: "shrink-0", description: "flex-shrink: 0 — prevents shrinking entirely" },
+    { class: "shrink", description: "flex-shrink: 1 — allows proportional shrinking" },
+    { class: "shrink-[2]", description: "flex-shrink: 2 — shrinks twice as much as shrink-1" },
+    { class: "shrink-[3]", description: "flex-shrink: 3 — shrinks three times as much as shrink-1" },
+    { class: "basis-auto shrink-0", description: "Content size + no shrinking" },
+    { class: "basis-full shrink", description: "Full width + proportional shrinking" },
   ],
-  example: "Control flex item shrink behavior",
+  example: "Items shrink when container is constrained",
   codeSnippet: `<div class="flex gap-4 w-96">
-  <div class="flex-shrink bg-green-500 p-4 whitespace-nowrap">No Shrink</div>
-  <div class="flex-shrink w-full bg-green-400 p-4">Shrinks</div>
+  <div class="shrink-0 bg-blue-500 p-4 whitespace-nowrap">Never shrinks</div>
+  <div class="shrink bg-green-500 p-4">Can shrink</div>
+  <div class="shrink-[2] bg-purple-500 p-4">Shrinks faster</div>
 </div>`,
 }
 
@@ -943,6 +948,24 @@ export const screenReaderUtilities: UtilityData = {
   Delete
   <span class="sr-only">item from list</span>
 </button>`,
+}
+
+// Align Self Utilities
+export const alignSelfUtilities: UtilityData = {
+  title: "Align Self",
+  description: "Control how an individual flex or grid item is aligned on the cross axis.",
+  classes: [
+    { class: "self-auto", description: "Auto alignment" },
+    { class: "self-start", description: "Align to start" },
+    { class: "self-end", description: "Align to end" },
+    { class: "self-center", description: "Center self" },
+    { class: "self-stretch", description: "Stretch self" },
+    { class: "self-baseline", description: "Align to baseline" },
+  ],
+  example: "Individual items align themselves",
+  codeSnippet: `<div class="flex gap-4 h-32">
+  <div class="self-center">Centered</div>
+</div>`,
 }
 
 // Background Gradient Stops

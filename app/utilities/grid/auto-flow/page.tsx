@@ -4,6 +4,15 @@ import { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import CodeBlock from "@/app/utilities/components/code-block";
+import { PageHero } from "@/components/shared/page-hero";
+import { UtilityGrid } from "@/components/shared/utility-grid";
+import { UtilityPlayground } from "@/components/shared/utility_playground";
+import { ExampleSection, ExampleCard } from "@/components/shared/example-section";
+import { TipsSection } from "@/components/shared/tips-section";
+import { CommonMistakesSection } from "@/components/shared/common-mistakes-section";
+import { MentalModelSection } from "@/components/shared/mental-model-section";
+import { ComparisonTable } from "@/components/shared/comparison-table";
+import { RealWorldExamples } from "@/components/shared/real-world-examples";
 
 type AutoFlow =
   | "grid-flow-row"
@@ -42,19 +51,209 @@ export default function GridAutoFlowPage() {
       <Navbar />
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-12 space-y-8">
-          {/* Header */}
-          <header className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-bold">Grid — Auto Flow</h1>
-            <p className="text-lg text-muted-foreground max-w-3xl">
-              Choose how auto-placed grid items fill the grid. Use{" "}
-              <code className="bg-slate-700 px-1 rounded">grid-flow-row</code>{" "}
-              (default) to fill rows,{" "}
-              <code className="bg-slate-700 px-1 rounded">grid-flow-col</code>{" "}
-              for horizontal flow, or add{" "}
-              <code className="bg-slate-700 px-1 rounded">-dense</code>
-              to pack items into gaps.
-            </p>
-          </header>
+          <PageHero 
+            title="Grid — Auto Flow"
+            description="You should reach for auto-flow utilities when you want to control how grid items automatically position themselves without explicit placement. Auto-flow determines the algorithm browsers use to fill empty grid cells — row-first (default), column-first, or dense packing for tighter layouts."
+          />
+
+          <MentalModelSection
+            title="Understanding Grid Auto Flow Mechanics"
+            description="Auto-flow is the browser's placement algorithm when you don't specify grid-item positions. It's a layout concern that determines coordinate assignment for automatically placed items."
+            features={[
+              "Default row flow places items left→right, then wraps to next row",
+              "Column flow places items top→bottom, then wraps to next column", 
+              "Dense mode backfills gaps with later items (visual reordering)",
+              "Flow algorithm respects explicit grid tracks (grid-template-areas)",
+              "Implicit tracks are created automatically when items exceed defined tracks"
+            ]}
+            layerAssignment="Layout Layer - Controls automatic item positioning algorithm"
+            browserBehavior="Browser evaluates each auto-placed item against current grid state, placing it according to flow direction and optionally filling gaps in dense mode"
+          />
+
+          <ComparisonTable
+            title="Grid Flow Modes: Algorithm Behavior"
+            columns={["Flow Mode", "Algorithm", "Visual Order vs DOM", "Best Use Case"]}
+            rows={[
+              {
+                feature: "grid-flow-row",
+                values: ["Place left→right, wrap down", "Matches DOM order", "Predictable card grids", "Standard layouts"]
+              },
+              {
+                feature: "grid-flow-col",
+                values: ["Place top→bottom, wrap right", "Matches DOM order", "Column-first galleries", "Horizontal scrollers"]
+              },
+              {
+                feature: "grid-flow-row-dense",
+                values: ["Row flow + gap fill", "May diverge from DOM", "Tight masonry packing", "Variable-height items"]
+              },
+              {
+                feature: "grid-flow-col-dense",
+                values: ["Column flow + gap fill", "May diverge from DOM", "Vertical space optimization", "Dashboard widgets"]
+              }
+            ]}
+          />
+
+          <CommonMistakesSection
+            mistakes={[
+              {
+                title: "Using dense mode without accessibility testing",
+                reason: "Dense mode changes visual order while preserving DOM order. Keyboard navigation and screen readers follow DOM order, creating mismatch between what users see and how they navigate.",
+                example: `// Layout Layer: Dense mode reorders visually
+<div class="grid grid-cols-3 grid-flow-row-dense gap-4">
+  <div>Item 1 (DOM order: 1, visual order: 2)</div>
+  <div>Item 2 (DOM order: 2, visual order: 1)</div>
+</div>
+
+// Layout Layer: Regular flow maintains order
+<div class="grid grid-cols-3 grid-flow-row gap-4">
+  <div>Item 1 (DOM order: 1, visual order: 1)</div>
+  <div>Item 2 (DOM order: 2, visual order: 2)</div>
+</div>`,
+                level: "critical"
+              },
+              {
+                title: "Auto-flow without explicit grid structure",
+                reason: "Auto-flow needs defined grid tracks to work predictably. Without explicit columns/rows, browsers create implicit tracks that may not match design intent.",
+                example: `// Layout Layer: No structure defined
+<div class="grid grid-flow-row">
+  <!-- Browser creates single column implicitly -->
+</div>
+
+// Layout Layer: Explicit structure + auto-flow
+<div class="grid grid-cols-3 grid-flow-row gap-4">
+  <!-- Auto-flow works within defined 3-column structure -->
+</div>`,
+                level: "warning"
+              },
+              {
+                title: "Column flow without width constraints",
+                reason: "grid-flow-col can create extremely wide containers. Column flow needs explicit width constraints or overflow handling.",
+                example: `// Layout Layer: Unbounded width
+<div class="grid grid-cols-4 grid-flow-col gap-4">
+  <!-- Container width grows indefinitely -->
+</div>
+
+// Layout Layer: Bounded column flow
+<div class="grid grid-cols-4 grid-flow-col gap-4 max-w-4xl overflow-x-auto">
+  <!-- Container has maximum width, horizontal scroll if needed -->
+</div>`,
+                level: "warning"
+              }
+            ]}
+          />
+
+          <UtilityGrid
+            title="Grid Auto Flow Utilities"
+            items={[
+              { cls: "grid-flow-row", desc: "Row flow (default)" },
+              { cls: "grid-flow-col", desc: "Column flow" },
+              { cls: "grid-flow-row-dense", desc: "Dense row packing" },
+              { cls: "grid-flow-col-dense", desc: "Dense column packing" },
+              { cls: "grid-cols-1", desc: "Single column" },
+              { cls: "grid-cols-2", desc: "Two columns" },
+              { cls: "grid-cols-3", desc: "Three columns" },
+              { cls: "grid-cols-4", desc: "Four columns" },
+              { cls: "grid-cols-6", desc: "Six columns" },
+              { cls: "grid-cols-12", desc: "Twelve columns" }
+            ]}
+          />
+
+          <MentalModelSection
+            title="Understanding Grid Auto Flow"
+            description="Grid auto-flow controls how items are automatically placed in the grid when you don't specify their position. It's the algorithm that decides where items go when you use grid-auto-flow properties."
+            features={[
+              "Items flow by default in row direction (left to right)",
+              "Can flow column-wise (top to bottom) with grid-flow-col",
+              "Dense mode packs items into gaps for tighter layouts",
+              "Affects visual order but preserves DOM order for accessibility",
+              "Works best with varying item sizes (masonry-style layouts)"
+            ]}
+            layerAssignment="Grid Placement Layer - Controls automatic item positioning algorithm"
+            browserBehavior="Browser places items according to the flow algorithm, filling rows or columns and optionally backfilling gaps in dense mode"
+          />
+
+          <ComparisonTable
+            title="Grid Flow Modes Comparison"
+            columns={["Flow Mode", "Placement Direction", "Best For", "Accessibility Notes"]}
+            rows={[
+              {
+                feature: "grid-flow-row",
+                values: ["Left→right, then wrap", "Card grids, galleries", "Predictable visual order", "DOM and visual order match"]
+              },
+              {
+                feature: "grid-flow-col", 
+                values: ["Top→bottom, then wrap", "Horizontal scrollers", "Column-first layouts", "DOM and visual order match"]
+              },
+              {
+                feature: "grid-flow-row-dense", 
+                values: ["Row flow + gap fill", "Masonry photos", "Variable height items", "Visual order may differ from DOM"]
+              },
+              {
+                feature: "grid-flow-col-dense", 
+                values: ["Column flow + gap fill", "Dashboard widgets", "Tight vertical packing", "Visual order may differ from DOM"]
+              }
+            ]}
+          />
+
+          <UtilityGrid
+            title="Grid Auto Flow Utilities"
+            items={[
+              { cls: "grid-flow-row", desc: "Row flow (default)" },
+              { cls: "grid-flow-col", desc: "Column flow" },
+              { cls: "grid-flow-row-dense", desc: "Dense row flow" },
+              { cls: "grid-flow-col-dense", desc: "Dense column flow" },
+              { cls: "grid-cols-1", desc: "1 column grid" },
+              { cls: "grid-cols-2", desc: "2 columns" },
+              { cls: "grid-cols-3", desc: "3 columns" },
+              { cls: "grid-cols-4", desc: "4 columns" },
+              { cls: "grid-cols-6", desc: "6 columns" },
+              { cls: "grid-cols-12", desc: "12 columns" }
+            ]}
+          />
+
+          <CommonMistakesSection
+            mistakes={[
+              {
+                title: "Using dense mode without considering keyboard navigation",
+                reason: "Dense mode can change visual order while preserving DOM order, causing keyboard navigation to follow a different path than what users see visually.",
+                example: `// Problem: Dense mode reorders visually but keyboard follows DOM
+<div class="grid grid-cols-3 grid-flow-row-dense">
+  <div>Item 1 (appears second visually)</div>
+  <div>Item 2 (appears first visually)</div>
+</div>`,
+                level: "critical"
+              },
+              {
+                title: "Assuming auto-flow fixes all responsive grid issues",
+                reason: "Auto-flow controls placement, not responsive behavior. You still need responsive grid-cols- utilities for proper breakpoints.",
+                example: `// Problem: No responsive columns
+<div class="grid grid-cols-4 grid-flow-row">
+  <!-- 4 columns on mobile too small -->
+</div>
+
+// Solution: Responsive columns
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 grid-flow-row">
+  <!-- Adapts to viewport -->
+</div>`,
+                level: "warning"
+              },
+              {
+                title: "Using column flow without overflow handling",
+                reason: "Grid-flow-col can create very wide containers that overflow horizontally without proper sizing or overflow handling.",
+                example: `// Problem: Column flow may overflow
+<div class="grid grid-cols-3 grid-flow-col">
+  <!-- Can exceed container width -->
+</div>
+
+// Solution: Add overflow or width constraints
+<div class="grid grid-cols-3 grid-flow-col overflow-x-auto">
+  <!-- Horizontal scroll if needed -->
+</div>`,
+                level: "warning"
+              }
+            ]}
+          />
+
           {/* Playground + utilities (focused only on auto-flow) */}
           <section className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-4">
@@ -724,83 +923,143 @@ export default function GridAutoFlowPage() {
               </div>
             </div>
           </section>
-          {/* Accessibility reminder (paste after examples) */}
-          <div className="border border-border rounded-lg p-4 bg-card/10">
-            <div className="flex gap-3">
-              <div className="flex-shrink-0">
-                <svg
-                  className="w-6 h-6 text-yellow-400"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden
-                >
-                  <path
-                    d="M12 8v4"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M12 17h.01"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="9"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+
+          <ExampleSection title="Real-World Auto Flow Patterns">
+            <ExampleCard
+              title="Photo Gallery with Dense Packing"
+              description="Masonry-style photo layout using row-dense to minimize gaps while maintaining accessibility."
+              code={`<!-- Layout Layer: Row-dense for tight packing -->
+<div class="grid grid-cols-4 grid-flow-row-dense gap-3">
+  <!-- Content Layer: Images with explicit dimensions -->
+  <img class="w-full h-48 object-cover rounded" src="photo1.jpg" />
+  <img class="w-full h-32 object-cover rounded" src="photo2.jpg" />
+  <img class="w-full h-64 object-cover rounded" src="photo3.jpg" />
+  <!-- Dense mode fills gaps automatically -->
+</div>
+
+<!-- Accessibility: Use semantic list if order matters -->
+<ul role="list" class="grid grid-cols-4 grid-flow-row-dense gap-3">
+  <li role="listitem"><img class="w-full h-48 object-cover rounded" src="photo1.jpg" /></li>
+  <li role="listitem"><img class="w-full h-32 object-cover rounded" src="photo2.jpg" /></li>
+</ul>`}
+            >
+              <div className="bg-slate-800 rounded p-3">
+                <div className="grid grid-cols-4 grid-flow-row-dense gap-3">
+                  <div className="h-48 bg-slate-700 rounded" />
+                  <div className="h-32 bg-slate-700 rounded" />
+                  <div className="h-64 bg-slate-700 rounded" />
+                  <div className="h-28 bg-slate-700 rounded" />
+                  <div className="h-36 bg-slate-700 rounded" />
+                  <div className="h-20 bg-slate-700 rounded" />
+                </div>
               </div>
+            </ExampleCard>
 
-              <div className="min-w-0">
-                <h4 className="text-sm font-semibold text-foreground">
-                  Accessibility reminder
-                </h4>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Grid auto-flow (especially{" "}
-                  <code className="bg-slate-700 px-1 rounded">-dense</code>)
-                  changes visual placement but <strong>not DOM order</strong>.
-                  Keyboard navigation, tab order and screen readers still follow
-                  DOM order.
-                </p>
+            <ExampleCard
+              title="Dashboard Widgets (Column-Dense)"
+              description="Dashboard with varying widget heights using column-dense to fill vertical gaps efficiently."
+              code={`<!-- Layout Layer: Column-dense for vertical optimization -->
+<div class="grid grid-cols-4 grid-flow-col-dense gap-4">
+  <!-- Content Layer: Widgets with intrinsic heights -->
+  <div class="bg-white rounded shadow p-4 h-24">Metric Card</div>
+  <div class="bg-white rounded shadow p-4 h-48">Tall Chart</div>
+  <div class="bg-white rounded shadow p-4 h-32">Medium Widget</div>
+  <!-- Dense mode backfills automatically -->
+</div>`}
+            >
+              <div className="bg-slate-800 rounded p-3 overflow-auto">
+                <div className="grid grid-cols-4 grid-flow-col-dense gap-3">
+                  <div className="h-24 bg-slate-700 rounded p-2 text-white text-xs">Metric</div>
+                  <div className="h-48 bg-slate-700 rounded p-2 text-white text-xs">Tall Chart</div>
+                  <div className="h-32 bg-slate-700 rounded p-2 text-white text-xs">Widget</div>
+                  <div className="h-20 bg-slate-700 rounded p-2 text-white text-xs">Short</div>
+                  <div className="h-36 bg-slate-700 rounded p-2 text-white text-xs">Medium</div>
+                  <div className="h-28 bg-slate-700 rounded p-2 text-white text-xs">Card</div>
+                </div>
+              </div>
+            </ExampleCard>
 
-                <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                  <li>
-                    <strong>Prefer semantic markup</strong> (e.g.,{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      &lt;ul role="list"&gt;
-                    </code>{" "}
-                    +{" "}
-                    <code className="bg-slate-700 px-1 rounded">
-                      &lt;li role="listitem"&gt;
-                    </code>
-                    ) for collections.
+            <ExampleCard
+              title="Responsive Navigation (Column Flow)"
+              description="Horizontal navigation using column flow with explicit width constraints and overflow handling."
+              code={`<!-- Layout Layer: Column flow with width bounds -->
+<nav class="grid grid-cols-4 grid-flow-col gap-4 max-w-4xl overflow-x-auto px-4">
+  <!-- Content Layer: Navigation items -->
+  <a href="#" class="px-4 py-2 bg-blue-500 text-white rounded">Home</a>
+  <a href="#" class="px-4 py-2 bg-gray-200 text-gray-800 rounded">About</a>
+  <a href="#" class="px-4 py-2 bg-gray-200 text-gray-800 rounded">Services</a>
+  <!-- Horizontal scroll if overflow -->
+</nav>`}
+            >
+              <div className="bg-slate-800 rounded p-3 overflow-auto">
+                <div className="grid grid-cols-4 grid-flow-col gap-3">
+                  <div className="px-3 py-2 bg-blue-600 rounded text-white text-xs text-center">Home</div>
+                  <div className="px-3 py-2 bg-slate-600 rounded text-white text-xs text-center">About</div>
+                  <div className="px-3 py-2 bg-slate-600 rounded text-white text-xs text-center">Services</div>
+                  <div className="px-3 py-2 bg-slate-600 rounded text-white text-xs text-center">Contact</div>
+                  <div className="px-3 py-2 bg-slate-600 rounded text-white text-xs text-center">Portfolio</div>
+                  <div className="px-3 py-2 bg-slate-600 rounded text-white text-xs text-center">Blog</div>
+                </div>
+              </div>
+            </ExampleCard>
+          </ExampleSection>
+
+          <TipsSection 
+            tips={[
+              { bold: "Accessibility first:", text: "Dense mode changes visual order - test with keyboard and screen readers. Use semantic markup when order matters." },
+              { bold: "Explicit tracks:", text: "Always define grid-cols-* or grid-rows-* for predictable auto-flow behavior." },
+              { bold: "Width constraints:", text: "grid-flow-col needs width limits or overflow handling to prevent horizontal overflow." },
+              { bold: "Performance:", text: "Dense mode requires more placement calculations - avoid on very large grids." },
+              { bold: "Responsive flow:", text: "Consider different flow modes at different breakpoints (e.g., row-flow on mobile, col-flow on desktop)." }
+            ]}
+          />
+
+          <div className="border border-yellow-500/30 rounded-lg p-6 bg-yellow-50/30 dark:bg-yellow-900/10">
+            <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-400 mb-4">🎯 Pre-Ship Checklist</h3>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold text-sm mb-3">Layout Layer Verification</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start">
+                    <input type="checkbox" className="mt-1 mr-2" readOnly />
+                    <span>Every grid has explicit columns/rows defined?</span>
                   </li>
-                  <li>
-                    <strong>If visual order must match focus:</strong> reorder
-                    the DOM or manage focus programmatically (set focus to the
-                    visually-first element after layout changes).
+                  <li className="flex items-start">
+                    <input type="checkbox" className="mt-1 mr-2" readOnly />
+                    <span>Column flow has width constraints or overflow?</span>
                   </li>
-                  <li>
-                    <strong>Announce dynamic changes:</strong> use{" "}
-                    <code className="bg-slate-700 px-1 rounded">aria-live</code>{" "}
-                    or accessible headings for updates to grids/galleries.
+                  <li className="flex items-start">
+                    <input type="checkbox" className="mt-1 mr-2" readOnly />
+                    <span>Dense mode accessibility tested with keyboard?</span>
+                  </li>
+                  <li className="flex items-start">
+                    <input type="checkbox" className="mt-1 mr-2" readOnly />
+                    <span>Responsive breakpoints defined for different screen sizes?</span>
                   </li>
                 </ul>
-
-                <p className="text-xs text-muted-foreground mt-3">
-                  Test with keyboard only (Tab/Shift+Tab), a screen reader
-                  (NVDA/VoiceOver) and by resizing the viewport — dense
-                  placement can be surprising if not considered.
-                </p>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-sm mb-3">Content & Accessibility</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start">
+                    <input type="checkbox" className="mt-1 mr-2" readOnly />
+                    <span>Semantic markup used for important content?</span>
+                  </li>
+                  <li className="flex items-start">
+                    <input type="checkbox" className="mt-1 mr-2" readOnly />
+                    <span>Screen reader tested on dense layouts?</span>
+                  </li>
+                  <li className="flex items-start">
+                    <input type="checkbox" className="mt-1 mr-2" readOnly />
+                    <span>Focus indicators visible on all interactive items?</span>
+                  </li>
+                  <li className="flex items-start">
+                    <input type="checkbox" className="mt-1 mr-2" readOnly />
+                    <span>Touch targets meet minimum size (44px) for mobile?</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>

@@ -6,8 +6,11 @@ import Footer from "@/components/footer";
 import { UtilityGrid } from "@/components/shared/utility-grid";
 import { TipsSection } from "@/components/shared/tips-section";
 import { PageHero } from "@/components/shared/page-hero";
-import { UtilityPlayground } from "@/components/shared/utility_playground";
 import { ExampleCard, ExampleSection } from "@/components/shared/example-section";
+import { UtilityPlayground } from "@/components/shared/utility_playground";
+import { CommonMistakesSection } from "@/components/shared/common-mistakes-section";
+import { MentalModelSection } from "@/components/shared/mental-model-section";
+import { ComparisonTable } from "@/components/shared/comparison-table";
 import {
   MAX_WIDTH_HERO,
   MAX_WIDTH_UTILITIES,
@@ -16,6 +19,62 @@ import {
   MAX_WIDTH_EXAMPLES,
 } from "./data";
 
+const maxWidthCommonMistakes = [
+  {
+    title: "Not using max-width for readability",
+    reason: "Unconstrained text on large screens creates very long lines that are difficult to read.",
+    example: "<div class=\"w-full\">Very long text line that spans the entire screen width...</div>",
+    level: "warning" as const
+  },
+  {
+    title: "Using max-width on flex items incorrectly",
+    reason: "max-width on flex items can prevent them from growing to fill available space.",
+    example: "<div class=\"flex\"><div class=\"flex-1 max-w-sm\">Won't grow</div></div>",
+    level: "info" as const
+  },
+  {
+    title: "Forgetting mx-auto for centering",
+    reason: "max-width constrains size but doesn't center elements without explicit centering.",
+    example: "<div class=\"max-w-md\">Left-aligned content</div> // Not centered",
+    level: "info" as const
+  }
+];
+
+const maxWidthMentalModel = {
+  title: "Understanding Max-Width in CSS",
+  description: "Max-width utilities establish an upper boundary for element width, preventing excessive growth while allowing natural shrinking.",
+  features: [
+    "Sets maximum width constraint but allows shrinking",
+    "Improves readability by limiting line length",
+    "Works naturally with responsive design",
+    "Often paired with mx-auto for centering"
+  ],
+  layerAssignment: "Constraint-based layout properties that define maximum space boundaries",
+  browserBehavior: "Browsers limit element growth during layout calculations when content exceeds max-width."
+};
+
+const maxWidthComparisonTable = {
+  title: "Width Constraint Strategies",
+  columns: ["Approach", "Behavior", "Best For", "Responsive"],
+  rows: [
+    {
+      feature: "max-w-prose",
+      values: ["Optimal reading", "Articles, blog posts", "Text content", "Natural"],
+    },
+    {
+      feature: "max-w-md/lg/xl",
+      values: ["Fixed maxima", "Forms, cards", "Components", "Adaptive"],
+    },
+    {
+      feature: "max-w-full",
+      values: ["Container limit", "Responsive images", "Media", "Fluid"],
+    },
+    {
+      feature: "max-w-none",
+      values: ["No limit", "Full-width banners", "Hero sections", "Explicit"]
+    }
+  ]
+};
 
 export default function MaxWidthPage() {
   return (
@@ -28,31 +87,42 @@ export default function MaxWidthPage() {
           {/* Hero */}
           <PageHero {...MAX_WIDTH_HERO} />
 
+          {/* Mental Model */}
+          <MentalModelSection {...maxWidthMentalModel} />
+
           {/* Utilities */}
           <UtilityGrid
             title="Max-width utilities"
             items={MAX_WIDTH_UTILITIES}
           />
 
+          {/* Comparison Table */}
+          <ComparisonTable {...maxWidthComparisonTable} />
+
           {/* Playground */}
-          <UtilityPlayground {...MAX_WIDTH_PLAYGROUND}/>
+          <UtilityPlayground {...MAX_WIDTH_PLAYGROUND} />
 
-          {/*Real world example*/}
+          {/* Common Mistakes */}
+          <CommonMistakesSection 
+            title="❌ Common Max-Width Mistakes"
+            mistakes={maxWidthCommonMistakes}
+          />
+
+          {/* Real World Examples */}
           <div data-testid="Real World Examples">
-          <ExampleSection title="Real-World Examples">
-          {MAX_WIDTH_EXAMPLES.map((ex) => (
-          <ExampleCard
-          key={ex.title}
-          title={ex.title}
-          description={ex.description}
-          code={ex.code}
-          >
-          {ex.preview}
-          </ExampleCard>
-            ))}
-          </ExampleSection>
+            <ExampleSection title="Real-World Examples">
+              {MAX_WIDTH_EXAMPLES.map((ex) => (
+                <ExampleCard
+                  key={ex.title}
+                  title={ex.title}
+                  description={ex.description}
+                  code={ex.code}
+                >
+                  {ex.preview}
+                </ExampleCard>
+              ))}
+            </ExampleSection>
           </div>
-
 
           {/* Tips */}
           <TipsSection tips={MAX_WIDTH_TIPS} />

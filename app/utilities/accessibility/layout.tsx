@@ -11,12 +11,16 @@ export default function AccessibilityLayout({
       <div className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <h2 className="text-lg font-semibold text-foreground mb-3">Accessibility Utilities</h2>
+          <div className="text-sm text-muted-foreground mb-4">
+            Content layer utilities for assistive technology compatibility
+          </div>
           <div className="flex gap-2 flex-wrap">
             <Link
               href="/utilities/accessibility/screen-readers"
               className="px-3 py-1 text-sm border border-border rounded hover:bg-card transition"
             >
               Screen Readers
+              <span className="block text-xs text-muted-foreground">sr-only • not-sr-only</span>
             </Link>
           </div>
         </div>

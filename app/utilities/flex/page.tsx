@@ -1,8 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import FlexLayout from "./layout";
+import { PageHero } from "@/components/shared/page-hero";
+import { UtilityGrid } from "@/components/shared/utility-grid";
+import { ExampleSection, ExampleCard } from "@/components/shared/example-section";
+import { TipsSection } from "@/components/shared/tips-section";
+import { MentalModelSection } from "@/components/shared/mental-model-section";
+import { ComparisonTable } from "@/components/shared/comparison-table";
+import { RealWorldExamples } from "@/components/cursor/real-world-examples";
 import CodeBlock from "@/app/utilities/components/code-block";
 
 type Direction =
@@ -76,51 +82,103 @@ export default function FlexOverviewPage() {
   <div class="${itemBehavior} p-3 rounded bg-slate-700 text-white text-center">Item 3</div>
 </div>`;
 
-  return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1">
+return (
+    <FlexLayout>
         <div className="max-w-7xl mx-auto px-4 py-12 space-y-8">
-          {/* Header */}
-          <header className="space-y-3">
-            <h1 className="text-5xl font-bold">Flex — Overview</h1>
-            <p className="text-lg text-muted-foreground max-w-3xl">
-              Core flex utilities, patterns and hands-on playground — learn how
-              direction, wrap, grow/shrink and basis interact to build
-              responsive UIs.
-            </p>
+        {/* Header */}
+        <PageHero 
+          title="Flex — Overview"
+          description="Core flex utilities, patterns and hands-on playground — learn how direction, wrap, grow/shrink and basis interact to build responsive UIs."
+        />
 
-            <div className="flex gap-3 items-center flex-wrap">
-              <div className="flex-1 md:flex-initial w-full md:w-96">
-                <label className="sr-only">Search utilities</label>
-                <input
-                  className="w-full px-3 py-2 rounded border bg-card/10 text-sm"
-                  placeholder="Search utilities (e.g. flex-col, flex-wrap, basis-1/3)"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </div>
+        <MentalModelSection
+          title="Understanding Flexbox Architecture"
+          description="Flexbox is a one-dimensional layout model that provides powerful ways to arrange, align, and distribute space among items in a container."
+          features={[
+            "Main axis and cross-axis concepts for flexible layout control",
+            "Direction-aware layout that adapts to writing modes",
+            "Flexible sizing with grow, shrink, and basis properties",
+            "Automatic space distribution and alignment capabilities",
+            "Responsive behavior through wrap and flex direction"
+          ]}
+          layerAssignment="Layout Layer - Provides flexible one-dimensional layout system"
+          browserBehavior="Browser calculates available space and distributes items based on flex properties, respecting container constraints"
+        />
 
-              <div className="ml-auto flex gap-2">
-                <button
-                  onClick={() => copyToClipboard(playgroundMarkup)}
-                  className="px-3 py-1 text-sm rounded border border-border hover:bg-card/50 cursor-pointer"
-                >
-                  Copy playground markup
-                </button>
-                <button
-                  onClick={() =>
-                    copyToClipboard(
-                      `<div class="flex flex-row gap-4"><div class="flex-1">A</div><div class="w-24">B</div></div>`
-                    )
-                  }
-                  className="px-3 py-1 text-sm rounded border border-border hover:bg-card/50 cursor-pointer"
-                >
-                  Copy quick example
-                </button>
-              </div>
-            </div>
-          </header>
+        <ComparisonTable
+          title="Flex Properties Comparison"
+          columns={["Property", "Main Axis", "Cross Axis", "Common Use Cases"]}
+          rows={[
+            {
+              feature: "Direction",
+              values: ["Controls main axis", "Affects alignment", "Row/Column layout", "Navs, sidebars"]
+            },
+            {
+              feature: "Wrap",
+              values: ["Line breaking", "Multi-line layout", "Overflow control", "Galleries, tags"]
+            },
+            {
+              feature: "Grow/Shrink",
+              values: ["Space distribution", "Scaling behavior", "Size adaptation", "Responsive grids"]
+            },
+            {
+              feature: "Basis",
+              values: ["Initial size", "Starting dimensions", "Width/height control", "Card layouts"]
+            }
+          ]}
+        />
+
+        <UtilityGrid
+          title="Flex Utilities Overview"
+          items={[
+            { cls: "flex-row", desc: "Horizontal layout (default)" },
+            { cls: "flex-col", desc: "Vertical stacking" },
+            { cls: "flex-row-reverse", desc: "Horizontal reverse" },
+            { cls: "flex-col-reverse", desc: "Vertical reverse" },
+            { cls: "flex-wrap", desc: "Allow wrapping" },
+            { cls: "flex-nowrap", desc: "No wrapping (default)" },
+            { cls: "flex-1", desc: "Equal growing" },
+            { cls: "flex-auto", desc: "Grow based on content" },
+            { cls: "flex-none", desc: "No growing/shrinking" },
+            { cls: "flex-grow", desc: "Allow growing" },
+            { cls: "flex-shrink", desc: "Allow shrinking" },
+            { cls: "basis-1/2", desc: "50% starting width" },
+            { cls: "order-1", desc: "Change visual order" },
+            { cls: "items-center", desc: "Cross-axis center" },
+            { cls: "justify-between", desc: "Space between items" }
+          ]}
+        />
+
+        <div className="flex gap-3 items-center flex-wrap">
+          <div className="flex-1 md:flex-initial w-full md:w-96">
+            <label className="sr-only">Search utilities</label>
+            <input
+              className="w-full px-3 py-2 rounded border bg-card/10 text-sm"
+              placeholder="Search utilities (e.g. flex-col, flex-wrap, basis-1/3)"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="ml-auto flex gap-2">
+            <button
+              onClick={() => copyToClipboard(playgroundMarkup)}
+              className="px-3 py-1 text-sm rounded border border-border hover:bg-card/50 cursor-pointer"
+            >
+              Copy playground markup
+            </button>
+            <button
+              onClick={() =>
+                copyToClipboard(
+                  `<div class="flex flex-row gap-4"><div class="flex-1">A</div><div class="w-24">B</div></div>`
+                )
+              }
+              className="px-3 py-1 text-sm rounded border border-border hover:bg-card/50 cursor-pointer"
+            >
+              Copy quick example
+            </button>
+          </div>
+        </div>
 
           {/* Utilities grid + cheat */}
           <section className="grid md:grid-cols-3 gap-6">
@@ -430,7 +488,7 @@ export default function FlexOverviewPage() {
   <div class="flex gap-4 flex-1 justify-center"> ... </div>
   <button>Sign In</button>
 </nav>`}
-                explanation={
+                description={
                   <>
                     Stack on mobile with{" "}
                     <code className="bg-slate-700 px-1 rounded">flex-col</code>,
@@ -464,7 +522,7 @@ export default function FlexOverviewPage() {
   <aside class="flex-shrink-0 w-56 flex flex-col p-4"> ... </aside>
   <main class="flex-1 p-6">Main content</main>
 </div>`}
-                explanation={
+                description={
                   <>
                     Sidebar uses{" "}
                     <code className="bg-slate-700 px-1 rounded">flex-col</code>{" "}
@@ -497,7 +555,7 @@ export default function FlexOverviewPage() {
   <img class="w-full md:w-48 h-40 object-cover rounded" src="/product.jpg" alt="Product" />
   <div class="flex-1"> ... </div>
 </div>`}
-                explanation={
+                description={
                   <>
                     Stack image above content on mobile (
                     <code className="bg-slate-700 px-1 rounded">flex-col</code>)
@@ -537,7 +595,7 @@ export default function FlexOverviewPage() {
   <img class="w-48 h-32 object-cover rounded" src="/img/1.jpg" />
   <img class="w-48 h-32 object-cover rounded" src="/img/2.jpg" />
 </div>`}
-                explanation={
+                description={
                   <>
                     Use{" "}
                     <code className="bg-slate-700 px-1 rounded">
@@ -566,7 +624,7 @@ export default function FlexOverviewPage() {
   <div class="p-3 rounded bg-slate-700 text-white">Newest</div>
   <div class="p-3 rounded bg-slate-700/90 text-white">Older</div>
 </div>`}
-                explanation={
+                description={
                   <>
                     Use{" "}
                     <code className="bg-slate-700 px-1 rounded">
@@ -601,7 +659,7 @@ export default function FlexOverviewPage() {
   <button class="px-4 py-2">Action</button>
   ...
 </div>`}
-                explanation={
+                description={
                   <>
                     Use{" "}
                     <code className="bg-slate-700 px-1 rounded">
@@ -637,7 +695,7 @@ export default function FlexOverviewPage() {
                 code={`<ol class="flex flex-row gap-2 flex-wrap items-center text-sm">
   <li>Home</li><li>/</li><li>Products</li><li>/</li><li>Item</li>
 </ol>`}
-                explanation={
+                description={
                   <>
                     Breadcrumbs read left→right — allow{" "}
                     <code className="bg-slate-700 px-1 rounded">flex-wrap</code>{" "}
@@ -665,7 +723,7 @@ export default function FlexOverviewPage() {
   <span class="px-2 py-1 rounded bg-slate-700 text-white">#ux</span>
   <input class="flex-1 min-w-[120px]" placeholder="Add tag" />
 </div>`}
-                explanation={
+                description={
                   <>
                     Let chips wrap naturally; keep the input with{" "}
                     <code className="bg-slate-700 px-1 rounded">min-w</code> so
@@ -698,65 +756,18 @@ export default function FlexOverviewPage() {
             </div>
           </section>
 
-          {/* Summary tips */}
-          <section className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 space-y-3">
-            <h3 className="font-semibold">Summary tips</h3>
-            <ul className="space-y-2 text-muted-foreground text-sm">
-              <li>
-                Use responsive switches (e.g.,{" "}
-                <code className="bg-slate-700 px-1 rounded">md:flex-row</code>)
-                for mobile-first design.
-              </li>
-              <li>
-                Prefer combining{" "}
-                <code className="bg-slate-700 px-1 rounded">basis-</code> with{" "}
-                <code className="bg-slate-700 px-1 rounded">flex-grow</code> for
-                predictable card widths.
-              </li>
-              <li>
-                Wrap is your friend for chips/galleries — use fixed width or
-                basis to keep rows consistent.
-              </li>
-              <li>Test keyboard order whenever using reverse utilities.</li>
-            </ul>
-          </section>
+          <TipsSection 
+            tips={[
+              { bold: "Responsive switches:", text: "Use md:flex-row/flex-col for mobile-first design patterns" },
+              { bold: "Combine properties:", text: "Use basis- with flex-grow for predictable card widths" },
+              { bold: "Wrap handling:", text: "Use flex-wrap for tags/galleries with fixed widths to maintain rows" },
+              { bold: "Order testing:", text: "Always test keyboard navigation when using *-reverse utilities" },
+              { bold: "Performance:", text: "Flexbox is GPU-accelerated - prefer over manual calculations" }
+            ]}
+          />
         </div>
-      </main>
-      <Footer />
-    </div>
+      </FlexLayout>
   );
 }
 
-/* Helper small Example card component (local) */
-function ExampleCard({
-  children,
-  title,
-  code,
-  explanation,
-}: {
-  children: React.ReactNode;
-  title: string;
-  code: string;
-  explanation: React.ReactNode;
-}) {
-  return (
-    <div className="border border-border rounded-lg p-4 bg-card/20 shadow-sm">
-      <div className="flex items-start justify-between mb-3">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        <div className="flex gap-2">
-          <button
-            onClick={() => navigator.clipboard?.writeText(code)}
-            className="text-xs px-2 py-1 rounded bg-muted/10 cursor-pointer"
-          >
-            Copy
-          </button>
-        </div>
-      </div>
 
-      <div className="mb-3 min-w-0">{children}</div>
-
-      <CodeBlock code={code} language="jsx" />
-      <p className="text-sm text-muted-foreground mt-2">{explanation}</p>
-    </div>
-  );
-}

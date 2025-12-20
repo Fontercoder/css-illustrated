@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import FlexLayout from "../layout";
+import { PageHero } from "@/components/shared/page-hero";
+import { UtilityGrid } from "@/components/shared/utility-grid";
+import { ExampleSection, ExampleCard } from "@/components/shared/example-section";
+import { TipsSection } from "@/components/shared/tips-section";
+import { MentalModelSection } from "@/components/shared/mental-model-section";
+import { CommonMistakesSection } from "@/components/shared/common-mistakes-section";
 import CodeBlock from "@/app/utilities/components/code-block";
 
 type OrderValue =
@@ -69,32 +74,73 @@ export default function FlexOrderPage() {
 </div>`;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
+    <FlexLayout>
+      <div className="max-w-7xl mx-auto px-4 py-12 space-y-12 text-foreground">
           {/* Header */}
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold">Flex Order</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl">
-              Control visual order of flex items without changing the DOM —
-              useful for toolbars, responsive layouts, and emphasis placement.
-            </p>
-          </div>
+          <PageHero 
+            title="Flex Order"
+            description="Control visual order of flex items without changing the DOM — useful for toolbars, responsive layouts, and emphasis placement."
+          />
+
+          <MentalModelSection
+            title="Understanding Flex Order"
+            description="Flex order manipulates the visual sequence of items within their layout context without affecting DOM order or accessibility flow."
+            features={[
+              "Changes visual rendering order only, not tab order",
+              "Requires flex or grid layout context to work",
+              "Default order is 0, negative numbers move to front",
+              "Order values are relative to siblings, not global",
+              "Screen readers still follow DOM order"
+            ]}
+            layerAssignment="Layout Layer - Controls visual sequencing within flex context"
+            browserBehavior="Browser reorders visual rendering while preserving original DOM structure for accessibility"
+          />
+
+          <CommonMistakesSection
+            mistakes={[
+              {
+                title: "Using order for accessibility fixes",
+                reason: "Visual reordering breaks keyboard navigation and screen reader expectations",
+                example: "<div class=\"order-last\">Important content placed first in DOM</div>",
+                level: "critical"
+              },
+              {
+                title: "Assuming order affects tab order",
+                reason: "Tab navigation follows DOM order, not visual order",
+                example: "<button class=\"order-first\">Appears first but tabindex follows DOM</button>",
+                level: "warning"
+              },
+              {
+                title: "Order without flex context",
+                reason: "Order utilities have no effect outside flex/grid containers",
+                example: "<div class=\"order-2\">No effect without parent flex container</div>",
+                level: "warning"
+              }
+            ]}
+          />
 
           {/* Utilities */}
-          <div className="space-y-6 border-t border-border pt-8">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-bold">Order Utilities</h2>
-              <p className="text-muted-foreground">
-                Click to copy any utility class.
-              </p>
-            </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
-              {ORDER_OPTIONS.map((o) => (
-                <button
-                  key={o.value}
+          <UtilityGrid
+            title="Flex Order Utilities"
+            items={[
+              { cls: "order-none", desc: "Normal order (0)" },
+              { cls: "order-first", desc: "First item (-9999)" },
+              { cls: "order-last", desc: "Last item (9999)" },
+              { cls: "order-1", desc: "Second position (1)" },
+              { cls: "order-2", desc: "Third position (2)" },
+              { cls: "order-3", desc: "Fourth position (3)" },
+              { cls: "order-4", desc: "Fifth position (4)" },
+              { cls: "order-5", desc: "Sixth position (5)" },
+              { cls: "order-6", desc: "Seventh position (6)" },
+              { cls: "order-7", desc: "Eighth position (7)" },
+              { cls: "order-8", desc: "Ninth position (8)" },
+              { cls: "order-9", desc: "Tenth position (9)" },
+              { cls: "order-10", desc: "Eleventh position (10)" },
+              { cls: "order-11", desc: "Twelfth position (11)" },
+              { cls: "order-12", desc: "Thirteenth position (12)" }
+            ]}
+          />
                   onClick={() => copyToClipboard(o.value)}
                   className="text-left border border-border rounded-lg p-4 hover:bg-card/50 transition flex flex-col group cursor-pointer"
                   aria-label={`Copy ${o.value}`}
@@ -739,10 +785,7 @@ export default function FlexOrderPage() {
                 utilities.
               </li>
             </ul>
-          </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </FlexLayout>
   );
 }
