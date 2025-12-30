@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useState, useEffect } from "react";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import CodeBlock from "@/app/utilities/components/code-block";
@@ -15,12 +14,6 @@ export interface UtilityPlaygroundConfig {
   optionLabel?: (value: string) => string;
   enableCodeEditor?: boolean;
   defaultCustomClasses?: string;
-  /** Optional external value (controlled mode) */
-  externalValue?: string;
-  /** Optional handler for external value changes */
-  onExternalValueChange?: (value: string) => void;
-  /** Optional extra controls to render underneath the options */
-  extraControls?: React.ReactNode;
 }
 
 export function UtilityPlayground({
@@ -33,9 +26,6 @@ export function UtilityPlayground({
   optionLabel = (v) => v,
   enableCodeEditor = true,
   defaultCustomClasses = "",
-  externalValue,
-  onExternalValueChange,
-  extraControls,
 }: UtilityPlaygroundConfig) {
   const [value, setValue] = useState(defaultValue);
   const [customClasses, setCustomClasses] = useState(defaultCustomClasses);
@@ -43,15 +33,12 @@ export function UtilityPlayground({
   const [editedCode, setEditedCode] = useState("");
   const { copy } = useCopyToClipboard();
 
-  // If externalValue is provided, use it as the source of truth
-  const currentValue = externalValue ?? value;
-
   useEffect(() => {
-    const initialCode = buildMarkup(currentValue, customClasses);
+    const initialCode = buildMarkup(value, customClasses);
     setEditedCode(initialCode);
-  }, [currentValue, customClasses, buildMarkup]);
+  }, [value, customClasses, buildMarkup]);
 
-  const code = isEditingCode ? editedCode : buildMarkup(currentValue, customClasses);
+  const code = isEditingCode ? editedCode : buildMarkup(value, customClasses);
 
   const handleCodeChange = (newCode: string) => {
     setEditedCode(newCode);
@@ -140,12 +127,9 @@ export function UtilityPlayground({
               {options.map((opt) => (
                 <button
                   key={opt}
-                  onClick={() => {
-                    if (onExternalValueChange) onExternalValueChange(opt);
-                    else setValue(opt);
-                  }}
+                  onClick={() => setValue(opt)}
                   className={`px-3 py-1 rounded border text-sm transition-all ${
-                    currentValue === opt
+                    value === opt
                       ? "border-blue-500 bg-blue-500/10 text-blue-600"
                       : "border-border hover:border-blue-300"
                   }`}
@@ -154,8 +138,6 @@ export function UtilityPlayground({
                 </button>
               ))}
             </div>
-
-            {extraControls && <div className="mt-3">{extraControls}</div>}
           </div>
 
           {enableCodeEditor && (
@@ -175,10 +157,10 @@ export function UtilityPlayground({
 
           <div>
             <button
-              onClick={() => copy(currentValue)}
+              onClick={() => copy(value)}
               className="w-full px-3 py-2 rounded border text-sm border-border hover:bg-muted/20 transition-all"
             >
-              Copy "{currentValue}"
+              Copy "{value}"
             </button>
           </div>
         </div>
@@ -188,7 +170,7 @@ export function UtilityPlayground({
           <div className="border border-border rounded-lg p-4 bg-card/30">
             <div className="mb-3 text-sm font-semibold">Live Preview</div>
             <div className="rounded p-4 bg-slate-800 min-h-32 flex items-center justify-center">
-              {renderPreview(currentValue, customClasses)}
+              {renderPreview(value, customClasses)}
             </div>
           </div>
 
